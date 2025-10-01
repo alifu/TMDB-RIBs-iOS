@@ -5,18 +5,73 @@
 //  Created by Alif on 18/09/25.
 //
 
+import RIBs
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    private var launchRouter: LaunchRouting?
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        guard let windowScene = (scene as? UIWindowScene) else { return }
+        let window = UIWindow(windowScene: windowScene)
+        self.window = window
+        
+        let rootBuilder = RootBuilder(dependency: AppComponent())
+        let launchRouter = rootBuilder.build()
+        self.launchRouter = launchRouter
+        
+        if #available(iOS 26.0, *) {
+            let appearance = UITabBarAppearance()
+//            appearance.configureWithLiquid()
+            
+            // optional tweaks
+            appearance.shadowColor = .clear   // remove top divider if you want
+            appearance.stackedLayoutAppearance.normal.iconColor = ColorUtils.mediumGrey
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+                    .foregroundColor: ColorUtils.mediumGrey
+                ]
+            appearance.stackedLayoutAppearance.selected.iconColor = ColorUtils.blue
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+                    .foregroundColor: ColorUtils.blue
+                ]
+            
+            let tabBar = UITabBar.appearance()
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
+        } else {
+            
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = ColorUtils.darkBlue
+            
+            let normalAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: ColorUtils.mediumGrey
+            ]
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = normalAttributes
+            appearance.inlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
+            appearance.compactInlineLayoutAppearance.normal.titleTextAttributes = normalAttributes
+            
+            let selectedAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: ColorUtils.blue
+            ]
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+            appearance.inlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+            appearance.compactInlineLayoutAppearance.selected.titleTextAttributes = selectedAttributes
+            
+            appearance.shadowColor = ColorUtils.blue
+            appearance.stackedLayoutAppearance.normal.iconColor = ColorUtils.mediumGrey
+            appearance.stackedLayoutAppearance.selected.iconColor = ColorUtils.blue
+            
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+        
+        launchRouter.launch(from: window)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
