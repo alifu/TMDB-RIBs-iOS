@@ -2,11 +2,12 @@
 //  HomeViewController.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 30/09/25.
+//  Created by Alif on 30/09/25.
 //
 
 import RIBs
 import RxSwift
+import SnapKit
 import UIKit
 
 protocol HomePresentableListener: AnyObject {
@@ -22,5 +23,40 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = ColorUtils.primary
+        self.navigationController?.navigationBar.isHidden = true
+        
+        setupUI()
+    }
+    
+    // MARK: - Private
+    
+    private let headerTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "What do you want to watch?"
+        label.textColor = .white
+        label.textAlignment = .left
+        label.font = UIFont.systemFont(ofSize: 18, weight: .bold)
+        return label
+    }()
+    
+    private let searchBox: SearchBox = {
+        let searchBox = SearchBox()
+        return searchBox
+    }()
+    
+    private func setupUI() {
+        self.view.addSubview(headerTitleLabel)
+        self.view.addSubview(searchBox)
+        
+        headerTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
+        
+        searchBox.snp.makeConstraints {
+            $0.top.equalTo(headerTitleLabel.snp.bottom).offset(24)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(42)
+        }
     }
 }

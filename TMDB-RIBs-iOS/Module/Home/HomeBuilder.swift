@@ -2,7 +2,7 @@
 //  HomeBuilder.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 30/09/25.
+//  Created by Alif on 30/09/25.
 //
 
 import RIBs
@@ -20,7 +20,7 @@ final class HomeComponent: Component<HomeDependency> {
 // MARK: - Builder
 
 protocol HomeBuildable: Buildable {
-    func build(withListener listener: HomeListener) -> HomeRouting
+    func build(withListener listener: HomeListener, apiManager: APIManager) -> HomeRouting
 }
 
 final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
@@ -29,10 +29,13 @@ final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
         super.init(dependency: dependency)
     }
 
-    func build(withListener listener: HomeListener) -> HomeRouting {
+    func build(withListener listener: HomeListener, apiManager: APIManager) -> HomeRouting {
         let component = HomeComponent(dependency: dependency)
         let viewController = HomeViewController()
-        let interactor = HomeInteractor(presenter: viewController)
+        let interactor = HomeInteractor(
+            presenter: viewController,
+            apiManager: apiManager
+        )
         interactor.listener = listener
         return HomeRouter(interactor: interactor, viewController: viewController)
     }

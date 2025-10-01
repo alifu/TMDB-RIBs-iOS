@@ -2,7 +2,7 @@
 //  ViewControllerWrapper.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 30/09/25.
+//  Created by Alif on 30/09/25.
 //
 
 import RIBs

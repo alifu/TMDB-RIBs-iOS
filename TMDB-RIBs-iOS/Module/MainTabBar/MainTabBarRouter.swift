@@ -2,7 +2,7 @@
 //  MainTabBarRouter.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 24/09/25.
+//  Created by Alif on 24/09/25.
 //
 
 import RIBs
@@ -42,7 +42,12 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
     }
     
     func attachTabs() {
-        let homeTabBuilder = homeBuilder.build(withListener: interactor)
+        let apiManager = APIManager.shared
+        
+        let homeTabBuilder = homeBuilder.build(
+            withListener: interactor,
+            apiManager: apiManager
+        )
         let searchTabBuilder = searchBuilder.build(withListener: interactor)
         let watchListTabBuilder = watchListBuilder.build(withListener: interactor)
         
@@ -82,7 +87,6 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
                 searchItem
             ])
         } else {
-            
             let homeNavigation = UINavigationController(rootViewController: homeTabBuilder.viewControllable.uiviewController)
             homeNavigation.tabBarItem = UITabBarItem(title: "Home", image: UIImage(named: "home"), tag: 0)
             

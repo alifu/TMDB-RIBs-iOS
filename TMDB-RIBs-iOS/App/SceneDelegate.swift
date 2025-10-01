@@ -5,6 +5,7 @@
 //  Created by Alif on 18/09/25.
 //
 
+import netfox
 import RIBs
 import UIKit
 
@@ -18,6 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        NFX.sharedInstance().start()
+        
         let window = UIWindow(windowScene: windowScene)
         self.window = window
         
@@ -27,18 +31,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if #available(iOS 26.0, *) {
             let appearance = UITabBarAppearance()
-//            appearance.configureWithLiquid()
-            
-            // optional tweaks
-            appearance.shadowColor = .clear   // remove top divider if you want
+            appearance.shadowColor = .clear
             appearance.stackedLayoutAppearance.normal.iconColor = ColorUtils.mediumGrey
             appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-                    .foregroundColor: ColorUtils.mediumGrey
-                ]
+                .foregroundColor: ColorUtils.mediumGrey
+            ]
             appearance.stackedLayoutAppearance.selected.iconColor = ColorUtils.blue
             appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-                    .foregroundColor: ColorUtils.blue
-                ]
+                .foregroundColor: ColorUtils.blue
+            ]
             
             let tabBar = UITabBar.appearance()
             tabBar.standardAppearance = appearance
