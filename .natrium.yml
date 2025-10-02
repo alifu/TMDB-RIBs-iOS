@@ -1,0 +1,30 @@
+settings:
+  class_name: BuildConfiguration
+
+environments:
+  - Debug
+  - Release
+
+natrium_variables:
+  BundleIdentifier:
+    Debug: AppWork.TMDB-RIBs-iOS
+    Release: AppWork.TMDB-RIBs-iOS
+
+xcconfig:
+  PRODUCT_BUNDLE_IDENTIFIER: "#{BundleIdentifier}"
+
+variables:
+  baseUrl:
+    Debug: "#env(BASE_URL_LOCAL)"
+    Release: "#env(BASE_URL_LIVE)"
+  token:
+    Debug: "#env(TMDB_LOCAL_TOKEN)"
+    Release: "#env(TMDB_LIVE_TOKEN)"
+
+plists:
+  "TMDB-RIBs-iOS/Info.plist":
+    CFBundleDisplayName:
+      Debug: TMDB-RIBs-iOS
+      Release: TMDB-RIBs-iOS
+
+    CFBundleIdentifier: "#{BundleIdentifier}"

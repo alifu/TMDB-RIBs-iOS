@@ -10,20 +10,6 @@ import Moya
 import RxMoya
 import RxSwift
 
-enum APIEnvironment {
-    case production
-    case local
-    
-    var baseURL: URL {
-        switch self {
-        case .production:
-            return URL(string: "https://api.themoviedb.org/3")!
-        case .local:
-            return URL(string: "http://localhost:3003")!
-        }
-    }
-}
-
 enum TheMovieAPI {
     
     case popular(request: TheMoviePopular.Request)
@@ -31,7 +17,7 @@ enum TheMovieAPI {
 
 extension TheMovieAPI: TargetType {
     
-    var baseURL: URL { APIManager.environment.baseURL }
+    var baseURL: URL { URL(string: Natrium.Config.baseUrl)! }
     var path: String {
         switch self {
         case .popular:
@@ -52,7 +38,7 @@ extension TheMovieAPI: TargetType {
     var headers: [String : String]? {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer \(APIManager.apiToken)"
+            "Authorization": "Bearer \(Natrium.Config.token)"
         ]
     }
 }
@@ -65,17 +51,7 @@ protocol TheMovieProtocol {
 struct APIManager {
     
     static let shared = APIManager()
-    static var environment: APIEnvironment = .production
     static let provider = MoyaProvider<TheMovieAPI>()
-    
-    static var apiToken: String {
-        switch environment {
-        case .production:
-            return ""
-        case .local:
-            return ""
-        }
-    }
     
     private init() {}
 }

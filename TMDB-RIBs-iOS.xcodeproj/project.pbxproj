@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A05A092C2E8E1F0000E1D78D /* Natrium in Frameworks */ = {isa = PBXBuildFile; productRef = A05A092B2E8E1F0000E1D78D /* Natrium */; };
+		A0D1019D2E8E33C500F98FF2 /* Natrium.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D1019A2E8E33C500F98FF2 /* Natrium.swift */; };
+		A0D1019E2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A0D1019B2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig */; };
+		A0D1019F2E8E33C500F98FF2 /* ProjectEnvironment.release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A0D1019C2E8E33C500F98FF2 /* ProjectEnvironment.release.xcconfig */; };
 		A0FB08362E7C3820004F4641 /* RIBs in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08352E7C3820004F4641 /* RIBs */; };
 		A0FB08392E7C3841004F4641 /* netfox in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08382E7C3841004F4641 /* netfox */; };
 		A0FB083C2E7C384D004F4641 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB083B2E7C384D004F4641 /* SnapKit */; };
@@ -45,6 +49,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A0D1019A2E8E33C500F98FF2 /* Natrium.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Natrium.swift; path = .natrium/Natrium.swift; sourceTree = "<group>"; };
+		A0D1019B2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProjectEnvironment.debug.xcconfig; path = .natrium/ProjectEnvironment.debug.xcconfig; sourceTree = "<group>"; };
+		A0D1019C2E8E33C500F98FF2 /* ProjectEnvironment.release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = ProjectEnvironment.release.xcconfig; path = .natrium/ProjectEnvironment.release.xcconfig; sourceTree = "<group>"; };
 		A0FB08002E7C376E004F4641 /* TMDB-RIBs-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TMDB-RIBs-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0FB08162E7C376F004F4641 /* TMDB-RIBs-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TMDB-RIBs-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0FB08202E7C376F004F4641 /* TMDB-RIBs-iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TMDB-RIBs-iOSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +102,7 @@
 				A0FB08492E7C38C0004F4641 /* RxCocoa in Frameworks */,
 				A0FB08572E7C3905004F4641 /* ReactiveMoya in Frameworks */,
 				A0FB08552E7C3905004F4641 /* Moya in Frameworks */,
+				A05A092C2E8E1F0000E1D78D /* Natrium in Frameworks */,
 				A0FB08522E7C38CF004F4641 /* Alamofire in Frameworks */,
 				A0FB085C2E7C3918004F4641 /* Nuke in Frameworks */,
 				A0FB08392E7C3841004F4641 /* netfox in Frameworks */,
@@ -127,6 +135,9 @@
 		A0FB07F72E7C376E004F4641 = {
 			isa = PBXGroup;
 			children = (
+				A0D1019A2E8E33C500F98FF2 /* Natrium.swift */,
+				A0D1019B2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig */,
+				A0D1019C2E8E33C500F98FF2 /* ProjectEnvironment.release.xcconfig */,
 				A0FB08022E7C376E004F4641 /* TMDB-RIBs-iOS */,
 				A0FB08192E7C376F004F4641 /* TMDB-RIBs-iOSTests */,
 				A0FB08232E7C376F004F4641 /* TMDB-RIBs-iOSUITests */,
@@ -180,6 +191,7 @@
 				A0FB085B2E7C3918004F4641 /* Nuke */,
 				A0FB085D2E7C3918004F4641 /* NukeExtensions */,
 				A0FB085F2E7C3918004F4641 /* NukeVideo */,
+				A05A092B2E8E1F0000E1D78D /* Natrium */,
 			);
 			productName = "TMDB-RIBs-iOS";
 			productReference = A0FB08002E7C376E004F4641 /* TMDB-RIBs-iOS.app */;
@@ -275,6 +287,7 @@
 				A0FB08502E7C38CF004F4641 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				A0FB08532E7C3905004F4641 /* XCRemoteSwiftPackageReference "Moya" */,
 				A0FB085A2E7C3918004F4641 /* XCRemoteSwiftPackageReference "Nuke" */,
+				A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A0FB08012E7C376E004F4641 /* Products */;
@@ -293,6 +306,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0D1019E2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig in Resources */,
+				A0D1019F2E8E33C500F98FF2 /* ProjectEnvironment.release.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,6 +332,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A0D1019D2E8E33C500F98FF2 /* Natrium.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -643,6 +659,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/UnlockAgency/Natrium.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.3.5;
+			};
+		};
 		A0FB08342E7C3820004F4641 /* XCRemoteSwiftPackageReference "RIBs-iOS" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/uber/RIBs-iOS.git";
@@ -718,6 +742,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A05A092B2E8E1F0000E1D78D /* Natrium */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */;
+			productName = Natrium;
+		};
 		A0FB08352E7C3820004F4641 /* RIBs */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A0FB08342E7C3820004F4641 /* XCRemoteSwiftPackageReference "RIBs-iOS" */;
