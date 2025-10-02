@@ -17,6 +17,9 @@ variables:
   baseUrl:
     Debug: "#env(BASE_URL_LOCAL)"
     Release: "#env(BASE_URL_LIVE)"
+  baseImageW500Url:
+    Debug: "#env(IMAGE_W500_BASE_URL)"
+    Release: "#env(IMAGE_W500_BASE_URL)"
   token:
     Debug: "#env(TMDB_LOCAL_TOKEN)"
     Release: "#env(TMDB_LIVE_TOKEN)"

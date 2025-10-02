@@ -10,6 +10,8 @@ import RxSwift
 
 protocol HomeRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
+    func attachPopularMovieChild(apiManager: APIManager) -> PopularMovieInteractable?
+    func detachPopularMovie()
 }
 
 protocol HomePresentable: Presentable {
@@ -41,7 +43,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
-        fetchPopularMovies()
+        attachPopularMovie()
     }
 
     override func willResignActive() {
@@ -49,17 +51,9 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         // TODO: Pause any business logic.
     }
     
-    func fetchPopularMovies() {
-        let request = TheMoviePopular.Request(page: 1, language: "en_US")
-        apiManager.fetchPopularMovie(request: request).subscribe(
-            onSuccess: { [weak self] response in
-                guard let `self` = self else { return }
-            },
-            onFailure: { [weak self] error in
-                guard let `self` = self else { return }
-                print("❌ API Error:", error)
-            }
-        )
-        .disposeOnDeactivate(interactor: self)
+    private func attachPopularMovie() {
+        if let child = router?.attachPopularMovieChild(apiManager: apiManager) {
+            child.listener = self
+        }
     }
 }

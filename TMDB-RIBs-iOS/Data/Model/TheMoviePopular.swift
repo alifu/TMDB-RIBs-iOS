@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxDataSources
 
 struct TheMoviePopular {
     
@@ -60,5 +61,17 @@ struct TheMoviePopular {
             case voteAverage = "vote_average"
             case voteCount = "vote_count"
         }
+    }
+}
+
+struct SectionOfPopularMovie {
+    var header: String
+    var items: [TheMoviePopular.Result]
+}
+
+extension SectionOfPopularMovie: SectionModelType {
+    init(original: SectionOfPopularMovie, items: [TheMoviePopular.Result]) {
+        self = original
+        self.items = items
     }
 }
