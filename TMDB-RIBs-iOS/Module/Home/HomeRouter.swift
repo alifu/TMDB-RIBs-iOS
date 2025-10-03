@@ -7,7 +7,7 @@
 
 import RIBs
 
-protocol HomeInteractable: Interactable, PopularMovieListener {
+protocol HomeInteractable: Interactable, PopularMovieListener, MovieListsListener {
     var router: HomeRouting? { get set }
     var listener: HomeListener? { get set }
 }
@@ -15,20 +15,25 @@ protocol HomeInteractable: Interactable, PopularMovieListener {
 protocol HomeViewControllable: ViewControllable {
     // TODO: Declare methods the router invokes to manipulate the view hierarchy.
     func attachPopularMovieView(viewController: ViewControllable?)
+    func attachMovieListsView(viewController: ViewControllable?)
 }
 
 final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, HomeRouting {
     
     private let popularMovieBuilder: PopularMovieBuildable
     private var popularMovie: PopularMovieRouting?
+    private let movieListsBuilder: MovieListsBuildable
+    private var movieLists: MovieListsRouting?
     
     // TODO: Constructor inject child builder protocols to allow building children.
     init(
         interactor: HomeInteractable,
         viewController: HomeViewControllable,
-        popularMovieBuilder: PopularMovieBuildable
+        popularMovieBuilder: PopularMovieBuildable,
+        movieListsBuilder: MovieListsBuildable
     ) {
         self.popularMovieBuilder = popularMovieBuilder
+        self.movieListsBuilder = movieListsBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
@@ -46,6 +51,22 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
         if let detach = popularMovie {
             detachChild(detach)
             popularMovie = nil
+        }
+    }
+    
+    func attachMovieListsChild(apiManager: APIManager) -> (any MovieListsInteractable)? {
+        guard movieLists == nil else { return movieLists?.interactable as? MovieListsInteractable }
+        let childRouter = movieListsBuilder.build(withListener: interactor, apiManager: apiManager)
+        movieLists = childRouter
+        attachChild(childRouter)
+        viewController.attachMovieListsView(viewController: movieLists?.viewControllable)
+        return childRouter.interactable as? MovieListsInteractable
+    }
+    
+    func detachMovieLists() {
+        if let detach = movieLists {
+            detachChild(detach)
+            movieLists = nil
         }
     }
 }

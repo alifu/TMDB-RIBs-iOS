@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-class SearchBox: UIView {
+final class SearchBox: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)

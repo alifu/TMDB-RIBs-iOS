@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-class HeaderBar: UIView {
+final class HeaderBar: UIView {
     
     
 }

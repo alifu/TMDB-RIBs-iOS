@@ -13,6 +13,7 @@ import RxSwift
 enum TheMovieAPI {
     
     case popular(request: TheMoviePopular.Request)
+    case nowPlaying(request: TheMovieNowPlaying.Request)
 }
 
 extension TheMovieAPI: TargetType {
@@ -21,7 +22,9 @@ extension TheMovieAPI: TargetType {
     var path: String {
         switch self {
         case .popular:
-            return "/discover/movie"
+            return "/movie/popular"
+        case .nowPlaying:
+            return "/movie/now_playing"
         }
     }
     var method: Moya.Method { .get }
@@ -29,6 +32,11 @@ extension TheMovieAPI: TargetType {
     var task: Task {
         switch self {
         case .popular(let request):
+            return .requestParameters(
+                parameters: ["language": request.language, "page": request.page],
+                encoding: URLEncoding.default
+            )
+        case .nowPlaying(let request):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
@@ -46,6 +54,7 @@ extension TheMovieAPI: TargetType {
 protocol TheMovieProtocol {
     
     func fetchPopularMovie(request: TheMoviePopular.Request) -> Single<TheMoviePopular.Response>
+    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request) -> Single<TheMovieNowPlaying.Response>
 }
 
 struct APIManager {
@@ -62,5 +71,11 @@ extension APIManager: TheMovieProtocol {
         return APIManager.provider.rx
             .request(.popular(request: request))
             .map(TheMoviePopular.Response.self)
+    }
+    
+    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request) -> Single<TheMovieNowPlaying.Response> {
+        return APIManager.provider.rx
+            .request(.nowPlaying(request: request))
+            .map(TheMovieNowPlaying.Response.self)
     }
 }

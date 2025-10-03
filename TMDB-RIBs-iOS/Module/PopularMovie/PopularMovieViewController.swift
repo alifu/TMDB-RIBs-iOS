@@ -39,7 +39,7 @@ final class PopularMovieViewController: UIViewController, PopularMoviePresentabl
     
     private let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfPopularMovie>(
         configureCell: { _, collectionView, indexPath, item in
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? PopularMovieCell {
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PopularMovieCell.idView(), for: indexPath) as? PopularMovieCell {
                 cell.setupContent(indexPath: indexPath, item: item)
                 return cell
             }
@@ -53,7 +53,7 @@ final class PopularMovieViewController: UIViewController, PopularMoviePresentabl
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(PopularMovieCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(PopularMovieCell.self, forCellWithReuseIdentifier: PopularMovieCell.idView())
         collectionView.backgroundColor = .clear
         collectionView.contentInset.left = 16
         collectionView.showsHorizontalScrollIndicator = false
@@ -75,7 +75,7 @@ final class PopularMovieViewController: UIViewController, PopularMoviePresentabl
 extension PopularMovieViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 24) / 2
+        let width = RatioUtils.aspectRatioOfPoster(withHeight: 226) + 32
         return CGSize(width: width, height: 250)
     }
 }

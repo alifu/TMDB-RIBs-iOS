@@ -12,6 +12,8 @@ protocol HomeRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
     func attachPopularMovieChild(apiManager: APIManager) -> PopularMovieInteractable?
     func detachPopularMovie()
+    func attachMovieListsChild(apiManager: APIManager) -> MovieListsInteractable?
+    func detachMovieLists()
 }
 
 protocol HomePresentable: Presentable {
@@ -44,6 +46,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         super.didBecomeActive()
         // TODO: Implement business logic here.
         attachPopularMovie()
+        attachMovieLists()
     }
 
     override func willResignActive() {
@@ -53,6 +56,12 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     
     private func attachPopularMovie() {
         if let child = router?.attachPopularMovieChild(apiManager: apiManager) {
+            child.listener = self
+        }
+    }
+    
+    private func attachMovieLists() {
+        if let child = router?.attachMovieListsChild(apiManager: apiManager) {
             child.listener = self
         }
     }

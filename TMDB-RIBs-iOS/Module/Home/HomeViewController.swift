@@ -50,10 +50,17 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
         return view
     }()
     
+    private let movieListContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private func setupUI() {
         self.view.addSubview(headerTitleLabel)
         self.view.addSubview(searchBox)
         self.view.addSubview(popularMoviewContainer)
+        self.view.addSubview(movieListContainer)
         
         headerTitleLabel.snp.makeConstraints {
             $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
@@ -71,15 +78,33 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(250)
         }
+        
+        movieListContainer.snp.makeConstraints {
+            $0.top.equalTo(popularMoviewContainer.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview()
+        }
     }
 }
 
 extension HomeViewController {
     
-    func attachPopularMovieView(viewController: (any ViewControllable)?) {
+    func attachPopularMovieView(viewController: ViewControllable?) {
         if let viewController {
             self.addChild(viewController.uiviewController)
             popularMoviewContainer.addSubview(viewController.uiviewController.view)
+            viewController.uiviewController.view.translatesAutoresizingMaskIntoConstraints = false
+            viewController.uiviewController.view.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+            viewController.uiviewController.didMove(toParent: self)
+        }
+    }
+    
+    func attachMovieListsView(viewController: ViewControllable?) {
+        if let viewController {
+            self.addChild(viewController.uiviewController)
+            movieListContainer.addSubview(viewController.uiviewController.view)
             viewController.uiviewController.view.translatesAutoresizingMaskIntoConstraints = false
             viewController.uiviewController.view.snp.makeConstraints { make in
                 make.edges.equalToSuperview()

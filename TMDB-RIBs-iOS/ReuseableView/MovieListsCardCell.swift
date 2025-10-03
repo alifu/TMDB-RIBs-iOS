@@ -1,15 +1,14 @@
 //
-//  PopularMovieCell.swift
+//  MovieListsCardCell.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 02/10/25.
+//  Created by Alif Phincon on 03/10/25.
 //
 
 import Nuke
-import SnapKit
 import UIKit
 
-final class PopularMovieCell: UICollectionViewCell {
+final class MovieListsCardCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,47 +27,21 @@ final class PopularMovieCell: UICollectionViewCell {
     
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
+        imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
         return imageView
     }()
     
-    private let numberLabel: UILabel = {
-        let label = UILabel()
-        label.textAlignment = .center
-        label.font = .systemFont(ofSize: 90, weight: .bold)
-        label.textColor = .black
-        label.backgroundColor = .clear
-        return label
-    }()
-    
     private func setupUI() {
         self.addSubview(posterImageView)
-        self.addSubview(numberLabel)
         
         posterImageView.snp.makeConstraints {
-            $0.top.equalToSuperview()
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview().inset(24)
-        }
-        
-        numberLabel.snp.makeConstraints {
-            $0.leading.equalToSuperview()
-            $0.bottom.equalToSuperview().inset(-16)
+            $0.edges.equalToSuperview()
         }
     }
     
-    func setupContent(indexPath: IndexPath, item: TheMoviePopular.Result) {
-        
-        let attributes: [NSAttributedString.Key: Any] = [
-            .strokeColor: ColorUtils.blue,
-            .foregroundColor: ColorUtils.darkBlue,
-            .strokeWidth: -1.0,
-            .font: UIFont.systemFont(ofSize: 90, weight: .bold)
-        ]
-        let textWithStroke = NSAttributedString(string: "\(indexPath.item + 1)", attributes: attributes)
-        numberLabel.attributedText = textWithStroke
+    func setupContent(item: TheMovieLists.Wrapper) {
         
         if let urlString = item.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)

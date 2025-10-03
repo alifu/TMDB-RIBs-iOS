@@ -53,7 +53,7 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
         // TODO: Pause any business logic.
     }
     
-    func fetchPopularMovies() {
+    private func fetchPopularMovies() {
         let request = TheMoviePopular.Request(page: 1, language: "en_US")
         apiManager.fetchPopularMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
