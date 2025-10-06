@@ -1,14 +1,14 @@
 //
-//  TheMoviePopular.swift
+//  TheMovieUpComing.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 01/10/25.
+//  Created by Alif Phincon on 06/10/25.
 //
 
 import Foundation
 import RxDataSources
 
-struct TheMoviePopular {
+struct TheMovieUpComing {
     
     struct Request {
         let page: Int
@@ -20,12 +20,14 @@ struct TheMoviePopular {
         let totalPages: Int
         let totalResults: Int
         let results: [Result]
+        let dates: Dates
         
         enum CodingKeys: String, CodingKey {
             case page
             case totalPages = "total_pages"
             case totalResults = "total_results"
             case results
+            case dates
         }
     }
     
@@ -66,21 +68,26 @@ struct TheMoviePopular {
             return TheMovieLists.Wrapper(id: self.id, posterPath: self.posterPath)
         }
     }
+    
+    struct Dates: Decodable {
+        let maximum: String
+        let minimum: String
+    }
 }
 
-struct SectionOfPopularMovie {
+struct SectionOfUpComingMovie {
     var header: String
-    var items: [TheMoviePopular.Result]
+    var items: [TheMovieUpComing.Result]
 }
 
-extension SectionOfPopularMovie: SectionModelType {
-    init(original: SectionOfPopularMovie, items: [TheMoviePopular.Result]) {
+extension SectionOfUpComingMovie: SectionModelType {
+    init(original: SectionOfUpComingMovie, items: [TheMovieUpComing.Result]) {
         self = original
         self.items = items
     }
 }
 
-extension Array where Element == TheMoviePopular.Result {
+extension Array where Element == TheMovieUpComing.Result {
     func toWrappers() -> [TheMovieLists.Wrapper] {
         return self.map { $0.toWrapper() }
     }

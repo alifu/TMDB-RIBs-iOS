@@ -1,14 +1,14 @@
 //
-//  TheMoviePopular.swift
+//  TheMovieTopRated.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 01/10/25.
+//  Created by Alif Phincon on 06/10/25.
 //
 
 import Foundation
 import RxDataSources
 
-struct TheMoviePopular {
+struct TheMovieTopRated {
     
     struct Request {
         let page: Int
@@ -68,19 +68,19 @@ struct TheMoviePopular {
     }
 }
 
-struct SectionOfPopularMovie {
+struct SectionOfTopRatedMovie {
     var header: String
-    var items: [TheMoviePopular.Result]
+    var items: [TheMovieTopRated.Result]
 }
 
-extension SectionOfPopularMovie: SectionModelType {
-    init(original: SectionOfPopularMovie, items: [TheMoviePopular.Result]) {
+extension SectionOfTopRatedMovie: SectionModelType {
+    init(original: SectionOfTopRatedMovie, items: [TheMovieTopRated.Result]) {
         self = original
         self.items = items
     }
 }
 
-extension Array where Element == TheMoviePopular.Result {
+extension Array where Element == TheMovieTopRated.Result {
     func toWrappers() -> [TheMovieLists.Wrapper] {
         return self.map { $0.toWrapper() }
     }

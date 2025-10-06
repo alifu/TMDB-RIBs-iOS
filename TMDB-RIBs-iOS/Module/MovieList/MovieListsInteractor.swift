@@ -61,6 +61,16 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     func didSelectMovieList(_ indexPath: IndexPath, item: TheMovieLists.Tab) {
         movieListData.select(id: item.id)
         movieLists.accept(movieListData)
+        switch item.type {
+        case .nowPlaying:
+            fetchNowPlayingMovies()
+        case .upcoming:
+            fetchUpComingMovies()
+        case .topRated:
+            fetchTopRatedMovies()
+        case .popular:
+            fetchPopularMovies()
+        }
     }
     
     // MARK: - Private
@@ -68,6 +78,54 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     private func fetchNowPlayingMovies() {
         let request = TheMovieNowPlaying.Request(page: 1, language: "en_US")
         apiManager.fetchNowPlayingMovie(request: request).subscribe(
+            onSuccess: { [weak self] response in
+                guard let `self` = self else { return }
+                let data = response.results.map { $0.toWrapper() }
+                self.movies.accept(data)
+            },
+            onFailure: { [weak self] error in
+                guard let `self` = self else { return }
+                print("❌ API Error:", error)
+            }
+        )
+        .disposeOnDeactivate(interactor: self)
+    }
+    
+    private func fetchUpComingMovies() {
+        let request = TheMovieUpComing.Request(page: 1, language: "en_US")
+        apiManager.fetchUpComingMovie(request: request).subscribe(
+            onSuccess: { [weak self] response in
+                guard let `self` = self else { return }
+                let data = response.results.map { $0.toWrapper() }
+                self.movies.accept(data)
+            },
+            onFailure: { [weak self] error in
+                guard let `self` = self else { return }
+                print("❌ API Error:", error)
+            }
+        )
+        .disposeOnDeactivate(interactor: self)
+    }
+    
+    private func fetchTopRatedMovies() {
+        let request = TheMovieTopRated.Request(page: 1, language: "en_US")
+        apiManager.fetchTopRatedMovie(request: request).subscribe(
+            onSuccess: { [weak self] response in
+                guard let `self` = self else { return }
+                let data = response.results.map { $0.toWrapper() }
+                self.movies.accept(data)
+            },
+            onFailure: { [weak self] error in
+                guard let `self` = self else { return }
+                print("❌ API Error:", error)
+            }
+        )
+        .disposeOnDeactivate(interactor: self)
+    }
+    
+    private func fetchPopularMovies() {
+        let request = TheMoviePopular.Request(page: 1, language: "en_US")
+        apiManager.fetchPopularMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }

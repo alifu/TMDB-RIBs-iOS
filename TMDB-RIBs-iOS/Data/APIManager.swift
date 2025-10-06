@@ -14,6 +14,8 @@ enum TheMovieAPI {
     
     case popular(request: TheMoviePopular.Request)
     case nowPlaying(request: TheMovieNowPlaying.Request)
+    case upComing(request: TheMovieUpComing.Request)
+    case topRated(request: TheMovieTopRated.Request)
 }
 
 extension TheMovieAPI: TargetType {
@@ -25,6 +27,10 @@ extension TheMovieAPI: TargetType {
             return "/movie/popular"
         case .nowPlaying:
             return "/movie/now_playing"
+        case .upComing:
+            return "/movie/upcoming"
+        case .topRated:
+            return "/movie/top_rated"
         }
     }
     var method: Moya.Method { .get }
@@ -37,6 +43,16 @@ extension TheMovieAPI: TargetType {
                 encoding: URLEncoding.default
             )
         case .nowPlaying(let request):
+            return .requestParameters(
+                parameters: ["language": request.language, "page": request.page],
+                encoding: URLEncoding.default
+            )
+        case .upComing(let request):
+            return .requestParameters(
+                parameters: ["language": request.language, "page": request.page],
+                encoding: URLEncoding.default
+            )
+        case .topRated(let request):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
@@ -55,6 +71,8 @@ protocol TheMovieProtocol {
     
     func fetchPopularMovie(request: TheMoviePopular.Request) -> Single<TheMoviePopular.Response>
     func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request) -> Single<TheMovieNowPlaying.Response>
+    func fetchUpComingMovie(request: TheMovieUpComing.Request) -> Single<TheMovieUpComing.Response>
+    func fetchTopRatedMovie(request: TheMovieTopRated.Request) -> Single<TheMovieTopRated.Response>
 }
 
 struct APIManager {
@@ -77,5 +95,17 @@ extension APIManager: TheMovieProtocol {
         return APIManager.provider.rx
             .request(.nowPlaying(request: request))
             .map(TheMovieNowPlaying.Response.self)
+    }
+    
+    func fetchUpComingMovie(request: TheMovieUpComing.Request) -> Single<TheMovieUpComing.Response> {
+        return APIManager.provider.rx
+            .request(.upComing(request: request))
+            .map(TheMovieUpComing.Response.self)
+    }
+    
+    func fetchTopRatedMovie(request: TheMovieTopRated.Request) -> Single<TheMovieTopRated.Response> {
+        return APIManager.provider.rx
+            .request(.topRated(request: request))
+            .map(TheMovieTopRated.Response.self)
     }
 }
