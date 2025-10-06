@@ -46,7 +46,6 @@ final class SearchBox: UIView {
         self.addSubview(containerView)
         containerView.addSubview(placeholderLabel)
         containerView.addSubview(searchImageView)
-        containerView.addSubview(placeholderLabel)
         
         containerView.snp.makeConstraints {
             $0.leading.top.trailing.equalToSuperview()

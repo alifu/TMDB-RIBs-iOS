@@ -6,13 +6,17 @@
 //
 
 import RIBs
+import RxCocoa
+import RxDataSources
 import RxSwift
+import SnapKit
 import UIKit
 
 protocol SearchPresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
+    func didSearch(with query: String)
 }
 
 final class SearchViewController: UIViewController, SearchPresentable, SearchViewControllable {
@@ -20,12 +24,13 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
     weak var listener: SearchPresentableListener?
     private let searchController = UISearchController(searchResultsController: nil)
     private var pendingRequestWorkItem: DispatchWorkItem?
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Search"
         self.view.backgroundColor = ColorUtils.primary
+        self.navigationController?.navigationBar.isHidden = true
         
         // Configure search controller
         searchController.obscuresBackgroundDuringPresentation = false
@@ -35,6 +40,66 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         
         // Optional: handle search text changes
         searchController.searchResultsUpdater = self
+        
+        setupUI()
+    }
+    
+    func bindMovieItems(_ items: Observable<[MovieItem]>) {
+        items
+            .map { [SectionOfMovieItem(header: "movie", items: $0)] }
+            .bind(to: tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+    }
+    
+    private let dataSource = RxTableViewSectionedReloadDataSource<SectionOfMovieItem>(
+        configureCell: { _, tableView, indexPath, item in
+            if let cell = tableView.dequeueReusableCell(withIdentifier: MovieCardCell.idView(), for: indexPath) as? MovieCardCell {
+                cell.setupContent(with: item)
+                cell.selectionStyle = .none
+                return cell
+            }
+            return UITableViewCell()
+        }
+    )
+    
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(MovieCardCell.self, forCellReuseIdentifier: MovieCardCell.idView())
+        tableView.backgroundColor = .clear
+        return tableView
+    }()
+    
+    private let headerView: HeaderBar = {
+        let view = HeaderBar()
+        view.backgroundColor = .clear
+        view.setupContent(titleText: "Search")
+        return view
+    }()
+    
+    private func setupUI() {
+        self.view.addSubview(headerView)
+        self.view.addSubview(tableView)
+        
+        headerView.snp.makeConstraints {
+            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(44)
+        }
+        
+        tableView.snp.makeConstraints {
+            $0.top.equalTo(headerView.snp.bottom)
+            $0.leading.trailing.bottom.equalToSuperview()
+        }
+        
+        tableView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+    }
+}
+
+extension SearchViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 144
     }
 }
 
@@ -51,9 +116,9 @@ extension SearchViewController: UISearchResultsUpdating {
             self?.performSearch(query: query)
         }
         
-        // Save the new work item and execute after 300ms
+        // Save the new work item and execute after 1000ms
         pendingRequestWorkItem = requestWorkItem
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: requestWorkItem)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: requestWorkItem)
     }
     
     private func performSearch(query: String) {
@@ -61,6 +126,7 @@ extension SearchViewController: UISearchResultsUpdating {
             print("Clear results")
         } else {
             print("Search for: \(query)")
+            self.listener?.didSearch(with: query)
         }
     }
 }

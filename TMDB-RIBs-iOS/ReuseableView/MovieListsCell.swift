@@ -2,7 +2,7 @@
 //  MovieListsCell.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 02/10/25.
+//  Created by Alif on 02/10/25.
 //
 
 import SnapKit

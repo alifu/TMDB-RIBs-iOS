@@ -15,13 +15,16 @@ xcconfig:
 
 variables:
   baseUrl:
-    Debug: "#env(BASE_URL_LOCAL)"
+    Debug: "#env(BASE_URL_LIVE)"
     Release: "#env(BASE_URL_LIVE)"
+  baseUrlLocal:
+    Debug: "#env(BASE_URL_LOCAL)"
+    Release: "#env(BASE_URL_LOCAL)"
   baseImageW500Url:
     Debug: "#env(IMAGE_W500_BASE_URL)"
     Release: "#env(IMAGE_W500_BASE_URL)"
   token:
-    Debug: "#env(TMDB_LOCAL_TOKEN)"
+    Debug: "#env(TMDB_LIVE_TOKEN)"
     Release: "#env(TMDB_LIVE_TOKEN)"
 
 plists:

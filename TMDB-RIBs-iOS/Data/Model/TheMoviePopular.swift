@@ -2,7 +2,7 @@
 //  TheMoviePopular.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 01/10/25.
+//  Created by Alif on 01/10/25.
 //
 
 import Foundation

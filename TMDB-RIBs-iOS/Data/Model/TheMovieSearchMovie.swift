@@ -1,18 +1,20 @@
 //
-//  TheMovieNowPlaying.swift
+//  TheMovieSearchMovie.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif on 03/10/25.
+//  Created by Alif on 06/10/25.
 //
 
 import Foundation
 import RxDataSources
 
-struct TheMovieNowPlaying {
+struct TheMovieSearchMovie {
     
     struct Request {
         let page: Int
         let language: String
+        let includeAdult: Bool
+        let query: String
     }
     
     struct Response: Decodable {
@@ -20,14 +22,12 @@ struct TheMovieNowPlaying {
         let totalPages: Int
         let totalResults: Int
         let results: [Result]
-        let dates: Dates
         
         enum CodingKeys: String, CodingKey {
             case page
             case totalPages = "total_pages"
             case totalResults = "total_results"
             case results
-            case dates
         }
     }
     
@@ -64,31 +64,23 @@ struct TheMovieNowPlaying {
             case voteCount = "vote_count"
         }
         
-        func toWrapper() -> TheMovieLists.Wrapper {
-            return TheMovieLists.Wrapper(id: self.id, posterPath: self.posterPath)
+        var releaseYear: String {
+            if let releaseDate = releaseDate {
+                return String(releaseDate.prefix(4))
+            }
+            return "N/A"
         }
     }
-    
-    struct Dates: Decodable {
-        let maximum: String
-        let minimum: String
-    }
 }
 
-struct SectionOfNowPlaying {
+struct SectionOfSearchMovie {
     var header: String
-    var items: [TheMovieNowPlaying.Result]
+    var items: [TheMovieSearchMovie.Result]
 }
 
-extension SectionOfNowPlaying: SectionModelType {
-    init(original: SectionOfNowPlaying, items: [TheMovieNowPlaying.Result]) {
+extension SectionOfSearchMovie: SectionModelType {
+    init(original: SectionOfSearchMovie, items: [TheMovieSearchMovie.Result]) {
         self = original
         self.items = items
-    }
-}
-
-extension Array where Element == TheMovieNowPlaying.Result {
-    func toWrappers() -> [TheMovieLists.Wrapper] {
-        return self.map { $0.toWrapper() }
     }
 }

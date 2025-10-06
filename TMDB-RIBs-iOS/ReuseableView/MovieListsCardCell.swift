@@ -2,7 +2,7 @@
 //  MovieListsCardCell.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 03/10/25.
+//  Created by Alif on 03/10/25.
 //
 
 import Nuke

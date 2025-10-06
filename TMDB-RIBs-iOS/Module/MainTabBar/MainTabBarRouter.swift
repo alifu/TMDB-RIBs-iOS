@@ -48,7 +48,10 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
             withListener: interactor,
             apiManager: apiManager
         )
-        let searchTabBuilder = searchBuilder.build(withListener: interactor)
+        let searchTabBuilder = searchBuilder.build(
+            withListener: interactor,
+            apiManager: apiManager
+        )
         let watchListTabBuilder = watchListBuilder.build(withListener: interactor)
         
         attachChild(homeTabBuilder)

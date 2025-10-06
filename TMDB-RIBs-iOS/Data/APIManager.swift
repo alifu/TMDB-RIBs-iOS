@@ -2,7 +2,7 @@
 //  APIManager.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 01/10/25.
+//  Created by Alif on 01/10/25.
 //
 
 import Foundation
@@ -12,15 +12,32 @@ import RxSwift
 
 enum TheMovieAPI {
     
-    case popular(request: TheMoviePopular.Request)
-    case nowPlaying(request: TheMovieNowPlaying.Request)
-    case upComing(request: TheMovieUpComing.Request)
-    case topRated(request: TheMovieTopRated.Request)
+    case popular(request: TheMoviePopular.Request, isLocal: Bool = false)
+    case nowPlaying(request: TheMovieNowPlaying.Request, isLocal: Bool = false)
+    case upComing(request: TheMovieUpComing.Request, isLocal: Bool = false)
+    case topRated(request: TheMovieTopRated.Request, isLocal: Bool = false)
+    case searchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool = false)
+    case movieDetail(id: Int, isLocal: Bool = false)
 }
 
 extension TheMovieAPI: TargetType {
     
-    var baseURL: URL { URL(string: Natrium.Config.baseUrl)! }
+    var baseURL: URL {
+        switch self {
+        case .popular(_, let isLocal),
+                .nowPlaying(_, let isLocal),
+                .upComing(_, let isLocal),
+                .topRated(_, let isLocal),
+                .searchMovie(_, let isLocal),
+                .movieDetail(_, let isLocal):
+            
+            if isLocal {
+                return URL(string: Natrium.Config.baseUrlLocal)!
+            } else {
+                return URL(string: Natrium.Config.baseUrl)!
+            }
+        }
+    }
     var path: String {
         switch self {
         case .popular:
@@ -31,30 +48,49 @@ extension TheMovieAPI: TargetType {
             return "/movie/upcoming"
         case .topRated:
             return "/movie/top_rated"
+        case .searchMovie:
+            return "/search/movie"
+        case .movieDetail(let id, _):
+            return "/movie/\(id)"
         }
     }
     var method: Moya.Method { .get }
     var sampleData: Data { Data() }
     var task: Task {
         switch self {
-        case .popular(let request):
+        case .popular(let request, _):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
             )
-        case .nowPlaying(let request):
+        case .nowPlaying(let request, _):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
             )
-        case .upComing(let request):
+        case .upComing(let request, _):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
             )
-        case .topRated(let request):
+        case .topRated(let request, _):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
+                encoding: URLEncoding.default
+            )
+        case .searchMovie(let request, _):
+            return .requestParameters(
+                parameters: [
+                    "language": request.language,
+                    "page": request.page,
+                    "include_adult": request.includeAdult,
+                    "query": request.query
+                ],
+                encoding: URLEncoding.default
+            )
+        case .movieDetail(_, _):
+            return .requestParameters(
+                parameters: ["language": "en-US"],
                 encoding: URLEncoding.default
             )
         }
@@ -69,10 +105,14 @@ extension TheMovieAPI: TargetType {
 
 protocol TheMovieProtocol {
     
-    func fetchPopularMovie(request: TheMoviePopular.Request) -> Single<TheMoviePopular.Response>
-    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request) -> Single<TheMovieNowPlaying.Response>
-    func fetchUpComingMovie(request: TheMovieUpComing.Request) -> Single<TheMovieUpComing.Response>
-    func fetchTopRatedMovie(request: TheMovieTopRated.Request) -> Single<TheMovieTopRated.Response>
+    func fetchPopularMovie(request: TheMoviePopular.Request, isLocal: Bool) -> Single<TheMoviePopular.Response>
+    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request, isLocal: Bool) -> Single<TheMovieNowPlaying.Response>
+    func fetchUpComingMovie(request: TheMovieUpComing.Request, isLocal: Bool) -> Single<TheMovieUpComing.Response>
+    func fetchTopRatedMovie(request: TheMovieTopRated.Request, isLocal: Bool) -> Single<TheMovieTopRated.Response>
+    func fetchSearchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<TheMovieSearchMovie.Response>
+    func fetchMovieDetail(id: Int, isLocal: Bool) -> Single<MovieDetailResponse>
+    
+    func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<[MovieItem]>
 }
 
 struct APIManager {
@@ -85,27 +125,60 @@ struct APIManager {
 
 extension APIManager: TheMovieProtocol {
     
-    func fetchPopularMovie(request: TheMoviePopular.Request) -> Single<TheMoviePopular.Response> {
+    func fetchPopularMovie(request: TheMoviePopular.Request, isLocal: Bool = false) -> Single<TheMoviePopular.Response> {
         return APIManager.provider.rx
-            .request(.popular(request: request))
+            .request(.popular(request: request, isLocal: isLocal))
             .map(TheMoviePopular.Response.self)
     }
     
-    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request) -> Single<TheMovieNowPlaying.Response> {
+    func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request, isLocal: Bool = false) -> Single<TheMovieNowPlaying.Response> {
         return APIManager.provider.rx
-            .request(.nowPlaying(request: request))
+            .request(.nowPlaying(request: request, isLocal: isLocal))
             .map(TheMovieNowPlaying.Response.self)
     }
     
-    func fetchUpComingMovie(request: TheMovieUpComing.Request) -> Single<TheMovieUpComing.Response> {
+    func fetchUpComingMovie(request: TheMovieUpComing.Request, isLocal: Bool = false) -> Single<TheMovieUpComing.Response> {
         return APIManager.provider.rx
-            .request(.upComing(request: request))
+            .request(.upComing(request: request, isLocal: isLocal))
             .map(TheMovieUpComing.Response.self)
     }
     
-    func fetchTopRatedMovie(request: TheMovieTopRated.Request) -> Single<TheMovieTopRated.Response> {
+    func fetchTopRatedMovie(request: TheMovieTopRated.Request, isLocal: Bool = false) -> Single<TheMovieTopRated.Response> {
         return APIManager.provider.rx
-            .request(.topRated(request: request))
+            .request(.topRated(request: request, isLocal: isLocal))
             .map(TheMovieTopRated.Response.self)
+    }
+    
+    func fetchSearchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool = false) -> Single<TheMovieSearchMovie.Response> {
+        return APIManager.provider.rx
+            .request(.searchMovie(request: request, isLocal: isLocal))
+            .map(TheMovieSearchMovie.Response.self)
+    }
+    
+    func fetchMovieDetail(id: Int, isLocal: Bool = false) -> Single<MovieDetailResponse> {
+        APIManager.provider.rx
+            .request(.movieDetail(id: id, isLocal: isLocal))
+            .map(MovieDetailResponse.self)
+    }
+    
+    func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool = false) -> Single<[MovieItem]> {
+        return fetchSearchMovie(request: request, isLocal: isLocal)
+            .flatMap { response -> Single<[MovieItem]> in
+                let detailSingles = response.results.map { movie in
+                    self.fetchMovieDetail(id: movie.id, isLocal: isLocal)
+                        .map { detail -> MovieItem in
+                            MovieItem(
+                                id: movie.id,
+                                title: movie.title,
+                                posterURL: movie.posterPath.map { $0 },
+                                rating: movie.voteAverage,
+                                releaseYear: movie.releaseYear,
+                                runtime: detail.runtime,
+                                genres: detail.genres.map { $0.name }
+                            )
+                        }
+                }
+                return Single.zip(detailSingles)
+            }
     }
 }

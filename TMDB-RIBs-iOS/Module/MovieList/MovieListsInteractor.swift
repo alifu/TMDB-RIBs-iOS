@@ -2,7 +2,7 @@
 //  MovieListsInteractor.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 02/10/25.
+//  Created by Alif on 02/10/25.
 //
 
 import RIBs
@@ -77,7 +77,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     private func fetchNowPlayingMovies() {
         let request = TheMovieNowPlaying.Request(page: 1, language: "en_US")
-        apiManager.fetchNowPlayingMovie(request: request).subscribe(
+        apiManager.fetchNowPlayingMovie(request: request, isLocal: true).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
@@ -93,7 +93,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     private func fetchUpComingMovies() {
         let request = TheMovieUpComing.Request(page: 1, language: "en_US")
-        apiManager.fetchUpComingMovie(request: request).subscribe(
+        apiManager.fetchUpComingMovie(request: request, isLocal: true).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
@@ -109,7 +109,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     private func fetchTopRatedMovies() {
         let request = TheMovieTopRated.Request(page: 1, language: "en_US")
-        apiManager.fetchTopRatedMovie(request: request).subscribe(
+        apiManager.fetchTopRatedMovie(request: request, isLocal: true).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
@@ -125,7 +125,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     private func fetchPopularMovies() {
         let request = TheMoviePopular.Request(page: 1, language: "en_US")
-        apiManager.fetchPopularMovie(request: request).subscribe(
+        apiManager.fetchPopularMovie(request: request, isLocal: true).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }

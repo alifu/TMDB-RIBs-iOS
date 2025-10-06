@@ -20,7 +20,7 @@ final class SearchComponent: Component<SearchDependency> {
 // MARK: - Builder
 
 protocol SearchBuildable: Buildable {
-    func build(withListener listener: SearchListener) -> SearchRouting
+    func build(withListener listener: SearchListener, apiManager: APIManager) -> SearchRouting
 }
 
 final class SearchBuilder: Builder<SearchDependency>, SearchBuildable {
@@ -29,10 +29,13 @@ final class SearchBuilder: Builder<SearchDependency>, SearchBuildable {
         super.init(dependency: dependency)
     }
 
-    func build(withListener listener: SearchListener) -> SearchRouting {
+    func build(withListener listener: SearchListener, apiManager: APIManager) -> SearchRouting {
         let component = SearchComponent(dependency: dependency)
         let viewController = SearchViewController()
-        let interactor = SearchInteractor(presenter: viewController)
+        let interactor = SearchInteractor(
+            presenter: viewController,
+            apiManager: apiManager
+        )
         interactor.listener = listener
         return SearchRouter(interactor: interactor, viewController: viewController)
     }

@@ -2,7 +2,7 @@
 //  TheMovieUpComing.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 06/10/25.
+//  Created by Alif on 06/10/25.
 //
 
 import Foundation

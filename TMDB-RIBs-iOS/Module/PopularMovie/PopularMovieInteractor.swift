@@ -2,7 +2,7 @@
 //  PopularMovieInteractor.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 02/10/25.
+//  Created by Alif on 02/10/25.
 //
 
 import RIBs
@@ -55,7 +55,7 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
     
     private func fetchPopularMovies() {
         let request = TheMoviePopular.Request(page: 1, language: "en_US")
-        apiManager.fetchPopularMovie(request: request).subscribe(
+        apiManager.fetchPopularMovie(request: request, isLocal: true).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 popularMovieRelay.accept(response.results)

@@ -6,7 +6,9 @@
 //
 
 import RIBs
+import RxCocoa
 import RxSwift
+import SnapKit
 import UIKit
 
 protocol WatchListPresentableListener: AnyObject {
@@ -22,5 +24,24 @@ final class WatchListViewController: UIViewController, WatchListPresentable, Wat
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = ColorUtils.primary
+        self.navigationController?.navigationBar.isHidden = true
+        setupUI()
+    }
+    
+    private let headerView: HeaderBar = {
+        let view = HeaderBar()
+        view.backgroundColor = .clear
+        view.setupContent(titleText: "Watch List")
+        return view
+    }()
+    
+    private func setupUI() {
+        self.view.addSubview(headerView)
+        
+        headerView.snp.makeConstraints {
+            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(44)
+        }
     }
 }
