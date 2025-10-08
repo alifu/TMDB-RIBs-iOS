@@ -28,6 +28,11 @@ final class WatchListViewController: UIViewController, WatchListPresentable, Wat
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     private let headerView: HeaderBar = {
         let view = HeaderBar()
         view.backgroundColor = .clear

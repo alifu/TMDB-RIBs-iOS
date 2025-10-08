@@ -62,12 +62,24 @@ final class HeaderBar: UIView {
         
         containerView.snp.makeConstraints {
             $0.leading.top.trailing.equalToSuperview()
-            $0.height.equalTo(42)
+            $0.height.equalTo(44)
         }
         
         titleLabel.snp.makeConstraints {
             $0.centerY.equalTo(containerView.snp.centerY)
             $0.centerX.equalTo(containerView.snp.centerX)
+        }
+        
+        leftButton.snp.makeConstraints {
+            $0.centerY.equalTo(containerView.snp.centerY)
+            $0.leading.equalTo(containerView.snp.leading).offset(16)
+            $0.height.width.equalTo(40)
+        }
+        
+        leftButton.snp.makeConstraints {
+            $0.centerY.equalTo(containerView.snp.centerY)
+            $0.trailing.equalTo(containerView.snp.leading).offset(-16)
+            $0.height.width.equalTo(40)
         }
     }
     

@@ -18,4 +18,14 @@ class RatioUtils {
         let height = (3 * width) / 2
         return height
     }
+    
+    static func aspectRatioOFBackDrop(withHeight height: CGFloat) -> CGFloat {
+        let width = (16 * height) / 9
+        return width
+    }
+    
+    static func aspectRatioOFBackDrop(withWidth width: CGFloat) -> CGFloat {
+        let height = (9 * width) / 16
+        return height
+    }
 }

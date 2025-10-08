@@ -28,6 +28,11 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     // MARK: - Private
     
     private let headerTitleLabel: UILabel = {
@@ -110,6 +115,13 @@ extension HomeViewController {
                 make.edges.equalToSuperview()
             }
             viewController.uiviewController.didMove(toParent: self)
+        }
+    }
+    
+    func openMovieDetail(viewController: (any ViewControllable)?) {
+        if let viewController {
+            self.navigationController?.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(viewController.uiviewController, animated: true)
         }
     }
 }

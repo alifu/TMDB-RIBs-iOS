@@ -44,6 +44,11 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     func bindMovieItems(_ items: Observable<[MovieItem]>) {
         items
             .map { [SectionOfMovieItem(header: "movie", items: $0)] }

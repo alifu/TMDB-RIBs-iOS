@@ -11,6 +11,8 @@ import UIKit
 
 final class PopularMovieCell: UICollectionViewCell {
     
+    private var currentTask: ImageTask?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .clear
@@ -22,6 +24,7 @@ final class PopularMovieCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
+        currentTask?.cancel()
         posterImageView.image = nil
         super.prepareForReuse()
     }
@@ -70,14 +73,25 @@ final class PopularMovieCell: UICollectionViewCell {
         let textWithStroke = NSAttributedString(string: "\(indexPath.item + 1)", attributes: attributes)
         numberLabel.attributedText = textWithStroke
         
+        currentTask?.cancel()
+        
         if let urlString = item.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)
-            ImagePipeline.shared.loadImage(with: request) { [weak self] result in
+            posterImageView.image = nil
+            currentTask = ImagePipeline.shared.loadImage(with: request) { [weak self] result in
                 guard let self else { return }
                 switch result {
                 case let .success(response):
-                    self.posterImageView.image = response.image
-                case .failure(_):
+                    UIView.transition(
+                        with: self.posterImageView,
+                        duration: 0.25,
+                        options: .transitionCrossDissolve,
+                        animations:
+                            {
+                                self.posterImageView.image = response.image
+                            }
+                    )
+                case .failure:
                     self.posterImageView.image = nil
                 }
             }

@@ -16,6 +16,7 @@ protocol PopularMoviePresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
+    func didSelectedMovie(_ movie: TheMoviePopular.Result)
 }
 
 final class PopularMovieViewController: UIViewController, PopularMoviePresentable, PopularMovieViewControllable {
@@ -69,6 +70,17 @@ final class PopularMovieViewController: UIViewController, PopularMoviePresentabl
         
         collectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
+        
+        Observable.zip(
+            collectionView.rx.itemSelected,
+            collectionView.rx.modelSelected(TheMoviePopular.Result.self)
+        )
+        .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
+        .subscribe(onNext: { [weak self] indexPath, selected in
+            guard let `self` = self else { return }
+            self.listener?.didSelectedMovie(selected)
+        })
+        .disposed(by: disposeBag)
     }
 }
 

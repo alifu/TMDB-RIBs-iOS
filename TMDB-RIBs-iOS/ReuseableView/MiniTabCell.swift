@@ -1,5 +1,5 @@
 //
-//  MovieListsCell.swift
+//  MiniTabCell.swift
 //  TMDB-RIBs-iOS
 //
 //  Created by Alif on 02/10/25.
@@ -8,7 +8,7 @@
 import SnapKit
 import UIKit
 
-final class MovieListsCell: UICollectionViewCell {
+final class MiniTabCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,6 +50,11 @@ final class MovieListsCell: UICollectionViewCell {
     }
     
     func setupContent(_ item: TheMovieLists.Tab) {
+        titleLabel.text = item.title
+        divider.isHidden = !item.isSelected
+    }
+    
+    func setupContent(_ item: TheMovieDetailInfo.Tab) {
         titleLabel.text = item.title
         divider.isHidden = !item.isSelected
     }

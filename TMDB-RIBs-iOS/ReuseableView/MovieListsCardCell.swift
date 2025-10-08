@@ -10,6 +10,8 @@ import UIKit
 
 final class MovieListsCardCell: UICollectionViewCell {
     
+    private var currentTask: ImageTask?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .clear
@@ -45,11 +47,19 @@ final class MovieListsCardCell: UICollectionViewCell {
         
         if let urlString = item.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)
-            ImagePipeline.shared.loadImage(with: request) { [weak self] result in
+            posterImageView.image = nil
+            currentTask = ImagePipeline.shared.loadImage(with: request) { [weak self] result in
                 guard let self else { return }
                 switch result {
                 case let .success(response):
-                    self.posterImageView.image = response.image
+                    UIView.transition(
+                        with: self.posterImageView,
+                        duration: 0.25,
+                        options: .transitionCrossDissolve,
+                        animations: {
+                            self.posterImageView.image = response.image
+                        }
+                    )
                 case .failure(_):
                     self.posterImageView.image = nil
                 }

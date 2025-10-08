@@ -21,6 +21,7 @@ protocol PopularMoviePresentable: Presentable {
 
 protocol PopularMovieListener: AnyObject {
     // TODO: Declare methods the interactor can invoke to communicate with other RIBs.
+    func didSelectPopularMovie(_ movie: TheMoviePopular.Result)
 }
 
 final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentable>, PopularMovieInteractable, PopularMoviePresentableListener {
@@ -66,5 +67,12 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
             }
         )
         .disposeOnDeactivate(interactor: self)
+    }
+}
+
+extension PopularMovieInteractor {
+    
+    func didSelectedMovie(_ movie: TheMoviePopular.Result) {
+        self.listener?.didSelectPopularMovie(movie)
     }
 }

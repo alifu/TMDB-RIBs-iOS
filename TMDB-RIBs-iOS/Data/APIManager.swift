@@ -18,6 +18,8 @@ enum TheMovieAPI {
     case topRated(request: TheMovieTopRated.Request, isLocal: Bool = false)
     case searchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool = false)
     case movieDetail(id: Int, isLocal: Bool = false)
+    case movieReview(id: Int, isLocal: Bool = false)
+    case movieCredit(id: Int, isLocal: Bool = false)
 }
 
 extension TheMovieAPI: TargetType {
@@ -29,7 +31,9 @@ extension TheMovieAPI: TargetType {
                 .upComing(_, let isLocal),
                 .topRated(_, let isLocal),
                 .searchMovie(_, let isLocal),
-                .movieDetail(_, let isLocal):
+                .movieDetail(_, let isLocal),
+                .movieReview(_, let isLocal),
+                .movieCredit(_, let isLocal):
             
             if isLocal {
                 return URL(string: Natrium.Config.baseUrlLocal)!
@@ -52,6 +56,10 @@ extension TheMovieAPI: TargetType {
             return "/search/movie"
         case .movieDetail(let id, _):
             return "/movie/\(id)"
+        case .movieReview(let id, _):
+            return "/movie/\(id)/reviews"
+        case .movieCredit(let id, let isLocal):
+            return "/movie/\(id)/credits"
         }
     }
     var method: Moya.Method { .get }
@@ -93,6 +101,16 @@ extension TheMovieAPI: TargetType {
                 parameters: ["language": "en-US"],
                 encoding: URLEncoding.default
             )
+        case .movieReview(_, _):
+            return .requestParameters(
+                parameters: ["language": "en-US"],
+                encoding: URLEncoding.default
+            )
+        case .movieCredit(_, _):
+            return .requestParameters(
+                parameters: ["language": "en-US"],
+                encoding: URLEncoding.default
+            )
         }
     }
     var headers: [String : String]? {
@@ -110,7 +128,9 @@ protocol TheMovieProtocol {
     func fetchUpComingMovie(request: TheMovieUpComing.Request, isLocal: Bool) -> Single<TheMovieUpComing.Response>
     func fetchTopRatedMovie(request: TheMovieTopRated.Request, isLocal: Bool) -> Single<TheMovieTopRated.Response>
     func fetchSearchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<TheMovieSearchMovie.Response>
-    func fetchMovieDetail(id: Int, isLocal: Bool) -> Single<MovieDetailResponse>
+    func fetchMovieDetail(id: Int, isLocal: Bool) -> Single<TheMovieDetail.Response>
+    func fetchMovieReviews(id: Int, isLocal: Bool) -> Single<TheMovieReview.Response>
+    func fetchMovieCredits(id: Int, isLocal: Bool) -> Single<TheMovieCredit.Response>
     
     func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<[MovieItem]>
 }
@@ -155,10 +175,22 @@ extension APIManager: TheMovieProtocol {
             .map(TheMovieSearchMovie.Response.self)
     }
     
-    func fetchMovieDetail(id: Int, isLocal: Bool = false) -> Single<MovieDetailResponse> {
+    func fetchMovieDetail(id: Int, isLocal: Bool = false) -> Single<TheMovieDetail.Response> {
         APIManager.provider.rx
             .request(.movieDetail(id: id, isLocal: isLocal))
-            .map(MovieDetailResponse.self)
+            .map(TheMovieDetail.Response.self)
+    }
+    
+    func fetchMovieReviews(id: Int, isLocal: Bool) -> Single<TheMovieReview.Response> {
+        APIManager.provider.rx
+            .request(.movieReview(id: id, isLocal: isLocal))
+            .map(TheMovieReview.Response.self)
+    }
+    
+    func fetchMovieCredits(id: Int, isLocal: Bool) -> Single<TheMovieCredit.Response> {
+        APIManager.provider.rx
+            .request(.movieCredit(id: id, isLocal: isLocal))
+            .map(TheMovieCredit.Response.self)
     }
     
     func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool = false) -> Single<[MovieItem]> {
@@ -173,7 +205,7 @@ extension APIManager: TheMovieProtocol {
                                 posterURL: movie.posterPath.map { $0 },
                                 rating: movie.voteAverage,
                                 releaseYear: movie.releaseYear,
-                                runtime: detail.runtime,
+                                runtime: detail.runtime ?? 0,
                                 genres: detail.genres.map { $0.name }
                             )
                         }

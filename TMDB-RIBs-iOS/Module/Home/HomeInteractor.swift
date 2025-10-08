@@ -14,6 +14,8 @@ protocol HomeRouting: ViewableRouting {
     func detachPopularMovie()
     func attachMovieListsChild(apiManager: APIManager) -> MovieListsInteractable?
     func detachMovieLists()
+    func openMovieDetail(withId: Int, apiManager: APIManager)
+    func detachMovieDetail()
 }
 
 protocol HomePresentable: Presentable {
@@ -64,5 +66,16 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         if let child = router?.attachMovieListsChild(apiManager: apiManager) {
             child.listener = self
         }
+    }
+}
+
+extension HomeInteractor {
+    
+    func didSelectPopularMovie(_ movie: TheMoviePopular.Result) {
+        self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
+    }
+    
+    func goBackFromMovieDetail() {
+        self.router?.detachMovieDetail()
     }
 }

@@ -7,7 +7,7 @@
 
 import RIBs
 
-protocol HomeInteractable: Interactable, PopularMovieListener, MovieListsListener {
+protocol HomeInteractable: Interactable, PopularMovieListener, MovieListsListener, MovieDetailListener {
     var router: HomeRouting? { get set }
     var listener: HomeListener? { get set }
 }
@@ -16,6 +16,7 @@ protocol HomeViewControllable: ViewControllable {
     // TODO: Declare methods the router invokes to manipulate the view hierarchy.
     func attachPopularMovieView(viewController: ViewControllable?)
     func attachMovieListsView(viewController: ViewControllable?)
+    func openMovieDetail(viewController: ViewControllable?)
 }
 
 final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, HomeRouting {
@@ -24,16 +25,20 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
     private var popularMovie: PopularMovieRouting?
     private let movieListsBuilder: MovieListsBuildable
     private var movieLists: MovieListsRouting?
+    private let movieDetailBuilder: MovieDetailBuildable
+    private var movieDetail: MovieDetailRouting?
     
     // TODO: Constructor inject child builder protocols to allow building children.
     init(
         interactor: HomeInteractable,
         viewController: HomeViewControllable,
         popularMovieBuilder: PopularMovieBuildable,
-        movieListsBuilder: MovieListsBuildable
+        movieListsBuilder: MovieListsBuildable,
+        movieDetailBuilder: MovieDetailBuildable
     ) {
         self.popularMovieBuilder = popularMovieBuilder
         self.movieListsBuilder = movieListsBuilder
+        self.movieDetailBuilder = movieDetailBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
@@ -67,6 +72,24 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
         if let detach = movieLists {
             detachChild(detach)
             movieLists = nil
+        }
+    }
+    
+    func openMovieDetail(withId: Int, apiManager: APIManager) {
+        let movieDetailRouter = movieDetailBuilder.build(
+            withListener: interactor,
+            apiManager: apiManager,
+            withMovieId: withId
+        )
+        movieDetail = movieDetailRouter
+        attachChild(movieDetailRouter)
+        viewController.openMovieDetail(viewController: movieDetail?.viewControllable)
+    }
+    
+    func detachMovieDetail() {
+        if let detach = movieDetail {
+            detachChild(detach)
+            movieDetail = nil
         }
     }
 }

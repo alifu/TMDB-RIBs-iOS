@@ -6,6 +6,7 @@
 //
 
 import netfox
+import Nuke
 import RIBs
 import UIKit
 
@@ -19,6 +20,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        // Configure Nuke cache pipeline
+        let dataCache = try? DataCache(name: "AppWork.TMDB-RIBs-iOS.imagecache")
+        dataCache?.sizeLimit = 200 * 1024 * 1024 // 200 MB
+        
+        let pipeline = ImagePipeline {
+            $0.dataCache = dataCache
+            $0.imageCache = ImageCache.shared
+            $0.isProgressiveDecodingEnabled = true
+        }
+        ImagePipeline.shared = pipeline
         
         NFX.sharedInstance().start()
         
