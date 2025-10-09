@@ -8,13 +8,38 @@
 import Foundation
 import RxDataSources
 
+struct TheMovieWatchListPost {
+    
+    struct Request {
+        let mediaType: String
+        let mediaId: Int
+        let watchlist: Bool
+        
+        enum CodingKeys: String, CodingKey {
+            case mediaType = "media_type"
+            case mediaId = "media_id"
+            case watchlist
+        }
+    }
+    
+    struct Response: Decodable {
+        let success: Bool
+        let statusCode: Int
+        let statusMessage: String
+        
+        enum CodingKeys: String, CodingKey {
+            case success
+            case statusCode = "status_code"
+            case statusMessage = "status_message"
+        }
+    }
+}
+
 struct TheMovieWatchList {
     
     struct Request {
         let page: Int
         let language: String
-        let includeAdult: Bool
-        let query: String
     }
     
     struct Response: Decodable {

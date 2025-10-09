@@ -17,6 +17,7 @@ protocol SearchPresentableListener: AnyObject {
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
     func didSearch(with query: String)
+    func didSelectMovie(_ movie: TheMovieSearchMovie.Result)
 }
 
 final class SearchViewController: UIViewController, SearchPresentable, SearchViewControllable {
@@ -98,6 +99,17 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         
         tableView.rx.setDelegate(self)
             .disposed(by: disposeBag)
+        
+        Observable.zip(
+            tableView.rx.itemSelected,
+            tableView.rx.modelSelected(TheMovieSearchMovie.Result.self)
+        )
+        .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
+        .subscribe(onNext: { [weak self] indexPath, selected in
+            guard let `self` = self else { return }
+            self.listener?.didSelectMovie(selected)
+        })
+        .disposed(by: disposeBag)
     }
 }
 
@@ -132,6 +144,16 @@ extension SearchViewController: UISearchResultsUpdating {
         } else {
             print("Search for: \(query)")
             self.listener?.didSearch(with: query)
+        }
+    }
+}
+
+extension SearchViewController {
+    
+    func openMovieDetail(viewController: (any ViewControllable)?) {
+        if let viewController {
+            self.navigationController?.hidesBottomBarWhenPushed = true
+            self.navigationController?.pushViewController(viewController.uiviewController, animated: true)
         }
     }
 }

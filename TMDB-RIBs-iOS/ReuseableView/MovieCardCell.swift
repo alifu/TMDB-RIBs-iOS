@@ -93,9 +93,21 @@ final class MovieCardCell: UITableViewCell {
     }
     
     func setupContent(with movie: TheMovieSearchMovie.Result) {
+        loadImage(path: movie.posterPath)
+        titleLabel.text = movie.title
+        releaseLabel.text = movie.releaseYear
+    }
+    
+    func setupContent(with movie: TheMovieWatchList.Result) {
+        loadImage(path: movie.posterPath)
+        titleLabel.text = movie.title
+        releaseLabel.text = movie.releaseYear
+    }
+    
+    private func loadImage(path: String?) {
         currentTask?.cancel()
         
-        if let urlString = movie.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
+        if let urlString = path, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)
             posterImageView.image = nil
             currentTask = ImagePipeline.shared.loadImage(with: request) { [weak self] result in
@@ -115,7 +127,5 @@ final class MovieCardCell: UITableViewCell {
                 }
             }
         }
-        titleLabel.text = movie.title
-        releaseLabel.text = movie.releaseYear
     }
 }

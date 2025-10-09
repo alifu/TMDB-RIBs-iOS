@@ -26,6 +26,9 @@ variables:
   token:
     Debug: "#env(TMDB_LIVE_TOKEN)"
     Release: "#env(TMDB_LIVE_TOKEN)"
+  accountID:
+    Debug: "#env(ACCOUNT_ID)"
+    Release: "#env(ACCOUNT_ID)"
 
 plists:
   "TMDB-RIBs-iOS/Info.plist":

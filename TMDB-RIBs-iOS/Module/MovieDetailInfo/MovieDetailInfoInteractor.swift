@@ -72,7 +72,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     }
     
     private func fetchMovieReviews() {
-        apiManager.fetchMovieReviews(id: withMovieId, isLocal: true).subscribe(
+        apiManager.fetchMovieReviews(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 self.movieReviews.accept(response.results)
@@ -86,7 +86,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     }
     
     private func fetchMovieCredits() {
-        apiManager.fetchMovieCredits(id: withMovieId, isLocal: true).subscribe(
+        apiManager.fetchMovieCredits(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 self.movieCredits.accept(response.cast)

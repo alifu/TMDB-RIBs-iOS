@@ -11,6 +11,8 @@ import RxSwift
 
 protocol SearchRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
+    func openMovieDetail(withId: Int, apiManager: APIManager)
+    func detachMovieDetail()
 }
 
 protocol SearchPresentable: Presentable {
@@ -66,5 +68,16 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     
     func didSearch(with query: String) {
         fetchSearchMovie(with: query)
+    }
+}
+
+extension SearchInteractor {
+    
+    func goBackFromMovieDetail() {
+        self.router?.detachMovieDetail()
+    }
+    
+    func didSelectMovie(_ movie: TheMovieSearchMovie.Result) {
+        self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
     }
 }

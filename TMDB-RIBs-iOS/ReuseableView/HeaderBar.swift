@@ -46,11 +46,13 @@ final class HeaderBar: UIView {
     
     private let leftButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .white
         return button
     }()
     
     private let rightButton: UIButton = {
         let button = UIButton()
+        button.tintColor = .white
         return button
     }()
     
@@ -76,9 +78,9 @@ final class HeaderBar: UIView {
             $0.height.width.equalTo(40)
         }
         
-        leftButton.snp.makeConstraints {
+        rightButton.snp.makeConstraints {
             $0.centerY.equalTo(containerView.snp.centerY)
-            $0.trailing.equalTo(containerView.snp.leading).offset(-16)
+            $0.trailing.equalTo(containerView.snp.trailing).offset(-16)
             $0.height.width.equalTo(40)
         }
     }
@@ -88,6 +90,11 @@ final class HeaderBar: UIView {
         leftButton.isHidden = leftImage == nil
         rightButton.isHidden = rightImage == nil
         leftButton.setImage(leftImage, for: .normal)
+        rightButton.setImage(rightImage, for: .normal)
+    }
+    
+    func updateRightButton(rightImage: UIImage? = nil) {
+        rightButton.isHidden = rightImage == nil
         rightButton.setImage(rightImage, for: .normal)
     }
 }

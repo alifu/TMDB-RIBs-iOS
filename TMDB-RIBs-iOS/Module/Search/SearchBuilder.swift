@@ -36,7 +36,12 @@ final class SearchBuilder: Builder<SearchDependency>, SearchBuildable {
             presenter: viewController,
             apiManager: apiManager
         )
+        let movieDetailBuilder = MovieDetailBuilder(dependency: component)
         interactor.listener = listener
-        return SearchRouter(interactor: interactor, viewController: viewController)
+        return SearchRouter(
+            interactor: interactor,
+            viewController: viewController,
+            movieDetailBuilder: movieDetailBuilder
+        )
     }
 }

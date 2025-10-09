@@ -17,6 +17,7 @@ protocol MovieDetailPresentableListener: AnyObject {
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
     func goBack()
+    func didClickSaveButton()
 }
 
 final class MovieDetailViewController: UIViewController, MovieDetailPresentable, MovieDetailViewControllable {
@@ -264,6 +265,13 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
                 self.listener?.goBack()
             })
             .disposed(by: disposeBag)
+        
+        headerView.rightTap
+            .subscribe(onNext: { [weak self] in
+                guard let `self` = self else { return }
+                self.listener?.didClickSaveButton()
+            })
+            .disposed(by: disposeBag)
     }
     
     private func loadImages(with data: Event<TheMovieDetail.Response>) {
@@ -325,6 +333,18 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
                 self.genreLabel.text = genres.joined(separator: ", ")
                 self.runtimeLabel.text = "\(data.element?.runtime ?? 0) Minutes"
             }
+            .disposed(by: disposeBag)
+    }
+    
+    func bindWatchListButton(with: Observable<Bool>) {
+        with
+            .subscribe(onNext: { [weak self] isWatchList in
+                guard let `self` = self else { return }
+                let image = isWatchList ? "saved" : "save"
+                self.headerView.updateRightButton(
+                    rightImage: UIImage(named: image)?.withRenderingMode(.alwaysTemplate)
+                )
+            })
             .disposed(by: disposeBag)
     }
 }

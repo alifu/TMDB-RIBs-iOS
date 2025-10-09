@@ -30,7 +30,7 @@ struct TheMovieDetail {
         let posterPath: String?
         let productionCompanies: [ProductionCompany]
         let productionCountries: [ProductionCountry]
-        let releaseDate: String?         // ISO date string ("YYYY-MM-DD")
+        let releaseDate: String? // ISO date string ("YYYY-MM-DD")
         let revenue: Int
         let runtime: Int?
         let spokenLanguages: [SpokenLanguage]
@@ -40,6 +40,7 @@ struct TheMovieDetail {
         let video: Bool
         let voteAverage: Double
         let voteCount: Int
+        var accountStates: TheMovieAccountStates.Response?
 
         enum CodingKeys: String, CodingKey {
             case adult
