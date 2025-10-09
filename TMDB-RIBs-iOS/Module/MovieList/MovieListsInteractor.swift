@@ -19,6 +19,7 @@ protocol MovieListsPresentable: Presentable {
     // TODO: Declare methods the interactor can invoke the presenter to present data.
     func bindMovieLists(_ data: Observable<[TheMovieLists.Tab]>)
     func bindMovies(_ data: Observable<[TheMovieLists.Wrapper]>)
+    func loading(_ isLoading: Observable<Bool>)
 }
 
 protocol MovieListsListener: AnyObject {
@@ -34,6 +35,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     private var movieLists: BehaviorRelay<[TheMovieLists.Tab]> = .init(value: theMovieLists)
     private var movieListData = theMovieLists
     private var movies: BehaviorRelay<[TheMovieLists.Wrapper]> = .init(value: [])
+    private var isLoading = PublishRelay<Bool>()
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -49,6 +51,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        self.presenter.loading(isLoading.asObservable())
         self.presenter.bindMovieLists(movieLists.asObservable())
         self.presenter.bindMovies(movies.asObservable())
         fetchNowPlayingMovies()
@@ -81,15 +84,18 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     // MARK: - Private
     
     private func fetchNowPlayingMovies() {
+        isLoading.accept(true)
         let request = TheMovieNowPlaying.Request(page: 1, language: "en_US")
         apiManager.fetchNowPlayingMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
                 self.movies.accept(data)
+                self.isLoading.accept(false)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )
@@ -97,15 +103,18 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     }
     
     private func fetchUpComingMovies() {
+        isLoading.accept(true)
         let request = TheMovieUpComing.Request(page: 1, language: "en_US")
         apiManager.fetchUpComingMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
                 self.movies.accept(data)
+                self.isLoading.accept(false)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )
@@ -113,15 +122,18 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     }
     
     private func fetchTopRatedMovies() {
+        isLoading.accept(true)
         let request = TheMovieTopRated.Request(page: 1, language: "en_US")
         apiManager.fetchTopRatedMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
                 self.movies.accept(data)
+                self.isLoading.accept(false)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )
@@ -129,15 +141,18 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     }
     
     private func fetchPopularMovies() {
+        isLoading.accept(true)
         let request = TheMoviePopular.Request(page: 1, language: "en_US")
         apiManager.fetchPopularMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 let data = response.results.map { $0.toWrapper() }
                 self.movies.accept(data)
+                self.isLoading.accept(false)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )

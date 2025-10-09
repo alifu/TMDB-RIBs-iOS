@@ -16,6 +16,7 @@ protocol PopularMovieRouting: ViewableRouting {
 protocol PopularMoviePresentable: Presentable {
     var listener: PopularMoviePresentableListener? { get set }
     func bindPopularMovie(_ movies: Observable<[TheMoviePopular.Result]>)
+    func loading(_ isLoading: Observable<Bool>)
     // TODO: Declare methods the interactor can invoke the presenter to present data.
 }
 
@@ -30,6 +31,7 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
     weak var listener: PopularMovieListener?
     private let apiManager: APIManager
     private var popularMovieRelay = BehaviorRelay<[TheMoviePopular.Result]>(value: [])
+    private var isLoading = PublishRelay<Bool>()
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -45,6 +47,7 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        presenter.loading(isLoading.asObservable())
         presenter.bindPopularMovie(popularMovieRelay.asObservable())
         fetchPopularMovies()
     }
@@ -55,14 +58,17 @@ final class PopularMovieInteractor: PresentableInteractor<PopularMoviePresentabl
     }
     
     private func fetchPopularMovies() {
+        isLoading.accept(true)
         let request = TheMoviePopular.Request(page: 1, language: "en_US")
         apiManager.fetchPopularMovie(request: request).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
-                popularMovieRelay.accept(response.results)
+                self.isLoading.accept(false)
+                self.popularMovieRelay.accept(response.results)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )

@@ -19,6 +19,7 @@ protocol SearchPresentable: Presentable {
     var listener: SearchPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
     func bindMovieItems(_ items: Observable<[TheMovieSearchMovie.Result]>)
+    func loading(_ isLoading: Observable<Bool>)
 }
 
 protocol SearchListener: AnyObject {
@@ -31,6 +32,7 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     weak var listener: SearchListener?
     private let apiManager: APIManager
     private var movieItemRelay: BehaviorRelay<[TheMovieSearchMovie.Result]> = .init(value: [])
+    private var isLoading = PublishRelay<Bool>()
     
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -46,6 +48,7 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        self.presenter.loading(isLoading.asObservable())
         self.presenter.bindMovieItems(movieItemRelay.asObservable())
     }
     
@@ -55,13 +58,16 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     }
     
     private func fetchSearchMovie(with query: String) {
+        isLoading.accept(true)
         let request = TheMovieSearchMovie.Request(page: 1, language: "en-US", includeAdult: true, query: query)
         apiManager.fetchSearchMovie(request: request)
             .subscribe(onSuccess: { [weak self] movies in
                 guard let self else { return }
                 self.movieItemRelay.accept(movies.results)
+                self.isLoading.accept(false)
             }, onFailure: { error in
                 print("Error:", error)
+                self.isLoading.accept(false)
             })
             .disposeOnDeactivate(interactor: self)
     }

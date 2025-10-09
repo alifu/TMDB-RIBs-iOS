@@ -27,12 +27,13 @@ final class WatchListViewController: UIViewController, WatchListPresentable, Wat
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = ColorUtils.primary
-        self.navigationController?.navigationBar.isHidden = true
+        
         setupUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
         self.tabBarController?.tabBar.isHidden = false
     }
     
@@ -113,5 +114,11 @@ extension WatchListViewController {
             self.navigationController?.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController.uiviewController, animated: true)
         }
+    }
+    
+    func loading(_ isLoading: Observable<Bool>) {
+        isLoading
+            .bind(to: self.view.rx.loaderVisible)
+            .disposed(by: disposeBag)
     }
 }

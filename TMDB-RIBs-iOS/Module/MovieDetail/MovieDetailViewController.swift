@@ -30,9 +30,14 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = ColorUtils.primary
+        
+        setupUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         self.navigationController?.navigationBar.isHidden = true
         self.tabBarController?.tabBar.isHidden = true
-        setupUI()
     }
     
     private let headerView: HeaderBar = {
@@ -352,9 +357,9 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
 extension MovieDetailViewController {
     
     func loading(_ isLoading: Observable<Bool>) {
-        //        isLoading
-        //            .bind(to: self.view.rx.hudVisible)
-        //            .disposed(by: disposeBag)
+        isLoading
+            .bind(to: self.view.rx.loaderVisible)
+            .disposed(by: disposeBag)
     }
     
     func attachMovieDetailInfo(viewController: ViewControllable?) {

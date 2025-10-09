@@ -31,7 +31,6 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         super.viewDidLoad()
         
         self.view.backgroundColor = ColorUtils.primary
-        self.navigationController?.navigationBar.isHidden = true
         
         // Configure search controller
         searchController.obscuresBackgroundDuringPresentation = false
@@ -47,6 +46,7 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
         self.tabBarController?.tabBar.isHidden = false
     }
     
@@ -155,5 +155,11 @@ extension SearchViewController {
             self.navigationController?.hidesBottomBarWhenPushed = true
             self.navigationController?.pushViewController(viewController.uiviewController, animated: true)
         }
+    }
+    
+    func loading(_ isLoading: Observable<Bool>) {
+        isLoading
+            .bind(to: self.view.rx.loaderVisible)
+            .disposed(by: disposeBag)
     }
 }

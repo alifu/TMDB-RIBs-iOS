@@ -22,6 +22,7 @@ protocol MovieDetailInfoPresentable: Presentable {
     func bindAboutMovie(_ data: Observable<String?>)
     func bindMovieReviews(_ data: Observable<[TheMovieReview.Result]>)
     func bindMovieCredits(_ data: Observable<[TheMovieCredit.Cast]>)
+    func loading(_ isLoading: Observable<Bool>)
 }
 
 protocol MovieDetailInfoListener: AnyObject {
@@ -40,6 +41,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     private var tabType: BehaviorRelay<MovieDetailInfoType> = .init(value: .aboutMovie)
     private var movieReviews: BehaviorRelay<[TheMovieReview.Result]> = .init(value: [])
     private var movieCredits: BehaviorRelay<[TheMovieCredit.Cast]> = .init(value: [])
+    private var isLoading = PublishRelay<Bool>()
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -59,6 +61,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        self.presenter.loading(isLoading.asObservable())
         self.presenter.bindTab(movieInfoTab.asObservable())
         self.presenter.bindSelectedTab(tabType.asObservable())
         self.presenter.bindAboutMovie(aboutMovieRelay.asObservable())
@@ -72,13 +75,16 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     }
     
     private func fetchMovieReviews() {
+        isLoading.accept(true)
         apiManager.fetchMovieReviews(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 self.movieReviews.accept(response.results)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )
@@ -86,13 +92,16 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     }
     
     private func fetchMovieCredits() {
+        isLoading.accept(true)
         apiManager.fetchMovieCredits(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 self.movieCredits.accept(response.cast)
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
+                self.isLoading.accept(false)
                 print("❌ API Error:", error)
             }
         )

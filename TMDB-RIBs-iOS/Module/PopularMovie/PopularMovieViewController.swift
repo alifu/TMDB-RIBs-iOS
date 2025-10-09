@@ -91,3 +91,12 @@ extension PopularMovieViewController: UICollectionViewDelegateFlowLayout {
         return CGSize(width: width, height: 250)
     }
 }
+
+extension PopularMovieViewController {
+    
+    func loading(_ isLoading: Observable<Bool>) {
+        isLoading
+            .bind(to: self.view.rx.loaderVisible)
+            .disposed(by: disposeBag)
+    }
+}

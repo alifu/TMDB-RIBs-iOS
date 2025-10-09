@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A04BE2522E97B14800AAA6E5 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = A04BE2512E97B14800AAA6E5 /* RxGesture */; };
 		A05A092C2E8E1F0000E1D78D /* Natrium in Frameworks */ = {isa = PBXBuildFile; productRef = A05A092B2E8E1F0000E1D78D /* Natrium */; };
 		A0D1019D2E8E33C500F98FF2 /* Natrium.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0D1019A2E8E33C500F98FF2 /* Natrium.swift */; };
 		A0D1019E2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = A0D1019B2E8E33C500F98FF2 /* ProjectEnvironment.debug.xcconfig */; };
@@ -16,7 +17,6 @@
 		A0FB083C2E7C384D004F4641 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB083B2E7C384D004F4641 /* SnapKit */; };
 		A0FB083F2E7C388D004F4641 /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB083E2E7C388D004F4641 /* Differentiator */; };
 		A0FB08412E7C388D004F4641 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08402E7C388D004F4641 /* RxDataSources */; };
-		A0FB08442E7C389F004F4641 /* MBProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08432E7C389F004F4641 /* MBProgressHUD */; };
 		A0FB08472E7C38C0004F4641 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08462E7C38C0004F4641 /* RxBlocking */; };
 		A0FB08492E7C38C0004F4641 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB08482E7C38C0004F4641 /* RxCocoa */; };
 		A0FB084B2E7C38C0004F4641 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = A0FB084A2E7C38C0004F4641 /* RxRelay */; };
@@ -95,13 +95,13 @@
 			files = (
 				A0FB08592E7C3905004F4641 /* RxMoya in Frameworks */,
 				A0FB084D2E7C38C0004F4641 /* RxSwift in Frameworks */,
-				A0FB08442E7C389F004F4641 /* MBProgressHUD in Frameworks */,
 				A0FB08602E7C3918004F4641 /* NukeVideo in Frameworks */,
 				A0FB083F2E7C388D004F4641 /* Differentiator in Frameworks */,
 				A0FB083C2E7C384D004F4641 /* SnapKit in Frameworks */,
 				A0FB08492E7C38C0004F4641 /* RxCocoa in Frameworks */,
 				A0FB08572E7C3905004F4641 /* ReactiveMoya in Frameworks */,
 				A0FB08552E7C3905004F4641 /* Moya in Frameworks */,
+				A04BE2522E97B14800AAA6E5 /* RxGesture in Frameworks */,
 				A05A092C2E8E1F0000E1D78D /* Natrium in Frameworks */,
 				A0FB08522E7C38CF004F4641 /* Alamofire in Frameworks */,
 				A0FB085C2E7C3918004F4641 /* Nuke in Frameworks */,
@@ -180,7 +180,6 @@
 				A0FB083B2E7C384D004F4641 /* SnapKit */,
 				A0FB083E2E7C388D004F4641 /* Differentiator */,
 				A0FB08402E7C388D004F4641 /* RxDataSources */,
-				A0FB08432E7C389F004F4641 /* MBProgressHUD */,
 				A0FB08482E7C38C0004F4641 /* RxCocoa */,
 				A0FB084A2E7C38C0004F4641 /* RxRelay */,
 				A0FB084C2E7C38C0004F4641 /* RxSwift */,
@@ -192,6 +191,7 @@
 				A0FB085D2E7C3918004F4641 /* NukeExtensions */,
 				A0FB085F2E7C3918004F4641 /* NukeVideo */,
 				A05A092B2E8E1F0000E1D78D /* Natrium */,
+				A04BE2512E97B14800AAA6E5 /* RxGesture */,
 			);
 			productName = "TMDB-RIBs-iOS";
 			productReference = A0FB08002E7C376E004F4641 /* TMDB-RIBs-iOS.app */;
@@ -282,12 +282,12 @@
 				A0FB08372E7C3841004F4641 /* XCRemoteSwiftPackageReference "netfox" */,
 				A0FB083A2E7C384D004F4641 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				A0FB083D2E7C388D004F4641 /* XCRemoteSwiftPackageReference "RxDataSources" */,
-				A0FB08422E7C389F004F4641 /* XCRemoteSwiftPackageReference "MBProgressHUD" */,
 				A0FB08452E7C38C0004F4641 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				A0FB08502E7C38CF004F4641 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				A0FB08532E7C3905004F4641 /* XCRemoteSwiftPackageReference "Moya" */,
 				A0FB085A2E7C3918004F4641 /* XCRemoteSwiftPackageReference "Nuke" */,
 				A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */,
+				A04BE2502E97B14800AAA6E5 /* XCRemoteSwiftPackageReference "RxGesture" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A0FB08012E7C376E004F4641 /* Products */;
@@ -659,6 +659,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		A04BE2502E97B14800AAA6E5 /* XCRemoteSwiftPackageReference "RxGesture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxGesture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.4;
+			};
+		};
 		A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/UnlockAgency/Natrium.git";
@@ -699,14 +707,6 @@
 				minimumVersion = 5.0.2;
 			};
 		};
-		A0FB08422E7C389F004F4641 /* XCRemoteSwiftPackageReference "MBProgressHUD" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/jdg/MBProgressHUD.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
-			};
-		};
 		A0FB08452E7C38C0004F4641 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
@@ -742,6 +742,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A04BE2512E97B14800AAA6E5 /* RxGesture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A04BE2502E97B14800AAA6E5 /* XCRemoteSwiftPackageReference "RxGesture" */;
+			productName = RxGesture;
+		};
 		A05A092B2E8E1F0000E1D78D /* Natrium */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A05A092A2E8E1F0000E1D78D /* XCRemoteSwiftPackageReference "Natrium" */;
@@ -771,11 +776,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A0FB083D2E7C388D004F4641 /* XCRemoteSwiftPackageReference "RxDataSources" */;
 			productName = RxDataSources;
-		};
-		A0FB08432E7C389F004F4641 /* MBProgressHUD */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A0FB08422E7C389F004F4641 /* XCRemoteSwiftPackageReference "MBProgressHUD" */;
-			productName = MBProgressHUD;
 		};
 		A0FB08462E7C38C0004F4641 /* RxBlocking */ = {
 			isa = XCSwiftPackageProductDependency;

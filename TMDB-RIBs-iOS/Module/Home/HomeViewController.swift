@@ -6,6 +6,8 @@
 //
 
 import RIBs
+import RxCocoa
+import RxGesture
 import RxSwift
 import SnapKit
 import UIKit
@@ -19,6 +21,7 @@ protocol HomePresentableListener: AnyObject {
 final class HomeViewController: UIViewController, HomePresentable, HomeViewControllable {
 
     weak var listener: HomePresentableListener?
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,6 +92,18 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
             $0.leading.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview()
         }
+        
+        searchBox.rx.tapGesture()
+            .when(.recognized)
+            .subscribe(onNext: { [weak self] _ in
+                guard let `self` = self else { return }
+                if #available(iOS 26.0, *) {
+                    self.tabBarController?.selectedIndex = 2
+                } else {
+                    self.tabBarController?.selectedIndex = 1
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
 

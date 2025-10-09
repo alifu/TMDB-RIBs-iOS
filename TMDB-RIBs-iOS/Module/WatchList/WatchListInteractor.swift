@@ -19,6 +19,7 @@ protocol WatchListPresentable: Presentable {
     var listener: WatchListPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
     func bindMovieItems(_ items: Observable<[TheMovieWatchList.Result]>)
+    func loading(_ isLoading: Observable<Bool>)
 }
 
 protocol WatchListListener: AnyObject {
@@ -31,6 +32,7 @@ final class WatchListInteractor: PresentableInteractor<WatchListPresentable>, Wa
     weak var listener: WatchListListener?
     private let apiManager: APIManager
     private var movieItemRelay: BehaviorRelay<[TheMovieWatchList.Result]> = .init(value: [])
+    private var isLoading = PublishRelay<Bool>()
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -46,6 +48,7 @@ final class WatchListInteractor: PresentableInteractor<WatchListPresentable>, Wa
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        self.presenter.loading(isLoading.asObservable())
         self.presenter.bindMovieItems(movieItemRelay.asObservable())
         fetchSearchMovie()
     }
@@ -56,13 +59,16 @@ final class WatchListInteractor: PresentableInteractor<WatchListPresentable>, Wa
     }
     
     private func fetchSearchMovie() {
+        isLoading.accept(true)
         let request = TheMovieWatchList.Request(page: 1, language: "en-US")
         apiManager.fetchMovieWatchList(request: request)
             .subscribe(onSuccess: { [weak self] movies in
                 guard let self else { return }
                 self.movieItemRelay.accept(movies.results)
+                self.isLoading.accept(false)
             }, onFailure: { error in
                 print("Error:", error)
+                self.isLoading.accept(false)
             })
             .disposeOnDeactivate(interactor: self)
     }

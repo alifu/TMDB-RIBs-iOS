@@ -149,3 +149,12 @@ extension MovieListsViewController: UICollectionViewDelegateFlowLayout {
         return .zero
     }
 }
+
+extension MovieListsViewController {
+    
+    func loading(_ isLoading: Observable<Bool>) {
+        isLoading
+            .bind(to: self.view.rx.loaderVisible)
+            .disposed(by: disposeBag)
+    }
+}
