@@ -49,14 +49,14 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    func bindMovieItems(_ items: Observable<[MovieItem]>) {
+    func bindMovieItems(_ items: Observable<[TheMovieSearchMovie.Result]>) {
         items
-            .map { [SectionOfMovieItem(header: "movie", items: $0)] }
+            .map { [SectionOfSearchMovie(header: "movie", items: $0)] }
             .bind(to: tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
     
-    private let dataSource = RxTableViewSectionedReloadDataSource<SectionOfMovieItem>(
+    private let dataSource = RxTableViewSectionedReloadDataSource<SectionOfSearchMovie>(
         configureCell: { _, tableView, indexPath, item in
             if let cell = tableView.dequeueReusableCell(withIdentifier: MovieCardCell.idView(), for: indexPath) as? MovieCardCell {
                 cell.setupContent(with: item)

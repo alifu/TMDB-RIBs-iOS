@@ -58,7 +58,7 @@ extension TheMovieAPI: TargetType {
             return "/movie/\(id)"
         case .movieReview(let id, _):
             return "/movie/\(id)/reviews"
-        case .movieCredit(let id, let isLocal):
+        case .movieCredit(let id, _):
             return "/movie/\(id)/credits"
         }
     }

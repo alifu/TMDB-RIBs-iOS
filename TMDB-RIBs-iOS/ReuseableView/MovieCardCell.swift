@@ -35,6 +35,7 @@ final class MovieCardCell: UITableViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
+        imageView.backgroundColor = .black
         return imageView
     }()
     
@@ -42,36 +43,6 @@ final class MovieCardCell: UITableViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
         label.numberOfLines = 0
-        label.textColor = .white
-        return label
-    }()
-    
-    private let ratingImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "star")
-        return imageView
-    }()
-    
-    private let ratingLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .white
-        return label
-    }()
-    
-    private let genreImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "ticket")
-        return imageView
-    }()
-    
-    private let genreLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
         label.textColor = .white
         return label
     }()
@@ -91,23 +62,8 @@ final class MovieCardCell: UITableViewCell {
         return label
     }()
     
-    private let runtimeImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.image = UIImage(named: "clock")
-        return imageView
-    }()
-    
-    private let runtimeLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
-        label.textColor = .white
-        return label
-    }()
-    
     private func setupUI() {
-        [posterImageView, titleLabel, ratingImageView, ratingLabel, genreImageView, genreLabel, releaseImageView, releaseLabel, runtimeImageView, runtimeLabel].forEach { item in
+        [posterImageView, titleLabel, releaseImageView, releaseLabel].forEach { item in
             self.contentView.addSubview(item)
         }
         
@@ -123,22 +79,10 @@ final class MovieCardCell: UITableViewCell {
             $0.trailing.equalToSuperview().inset(16)
         }
         
-        runtimeImageView.snp.makeConstraints {
-            $0.leading.equalTo(posterImageView.snp.trailing).offset(8)
-            $0.width.height.equalTo(16)
-            $0.bottom.equalToSuperview().inset(13)
-        }
-        
-        runtimeLabel.snp.makeConstraints {
-            $0.leading.equalTo(runtimeImageView.snp.trailing).offset(4)
-            $0.centerY.equalTo(runtimeImageView.snp.centerY)
-            $0.trailing.equalToSuperview().inset(16)
-        }
-        
         releaseImageView.snp.makeConstraints {
             $0.leading.equalTo(posterImageView.snp.trailing).offset(8)
             $0.width.height.equalTo(16)
-            $0.bottom.equalTo(runtimeImageView.snp.top).offset(-2)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(8)
         }
         
         releaseLabel.snp.makeConstraints {
@@ -146,36 +90,12 @@ final class MovieCardCell: UITableViewCell {
             $0.centerY.equalTo(releaseImageView.snp.centerY)
             $0.trailing.equalToSuperview().inset(16)
         }
-        
-        genreImageView.snp.makeConstraints {
-            $0.leading.equalTo(posterImageView.snp.trailing).offset(8)
-            $0.width.height.equalTo(16)
-            $0.bottom.equalTo(releaseImageView.snp.top).offset(-2)
-        }
-        
-        genreLabel.snp.makeConstraints {
-            $0.leading.equalTo(genreImageView.snp.trailing).offset(4)
-            $0.centerY.equalTo(genreImageView.snp.centerY)
-            $0.trailing.equalToSuperview().inset(16)
-        }
-        
-        ratingImageView.snp.makeConstraints {
-            $0.leading.equalTo(posterImageView.snp.trailing).offset(8)
-            $0.width.height.equalTo(16)
-            $0.bottom.equalTo(genreImageView.snp.top).offset(-2)
-        }
-        
-        ratingLabel.snp.makeConstraints {
-            $0.leading.equalTo(ratingImageView.snp.trailing).offset(4)
-            $0.centerY.equalTo(ratingImageView.snp.centerY)
-            $0.trailing.equalToSuperview().inset(16)
-        }
     }
     
-    func setupContent(with movie: MovieItem) {
+    func setupContent(with movie: TheMovieSearchMovie.Result) {
         currentTask?.cancel()
         
-        if let urlString = movie.posterURL, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
+        if let urlString = movie.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)
             posterImageView.image = nil
             currentTask = ImagePipeline.shared.loadImage(with: request) { [weak self] result in
@@ -196,9 +116,6 @@ final class MovieCardCell: UITableViewCell {
             }
         }
         titleLabel.text = movie.title
-        ratingLabel.text = "\(movie.rating)"
-        genreLabel.text = movie.genres.joined(separator: ", ")
         releaseLabel.text = movie.releaseYear
-        runtimeLabel.text = "\(movie.runtime) min"
     }
 }

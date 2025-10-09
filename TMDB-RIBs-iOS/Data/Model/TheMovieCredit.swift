@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxDataSources
 
 struct TheMovieCredit {
 
@@ -43,5 +44,16 @@ struct TheMovieCredit {
             case order
         }
     }
+}
 
+struct SectionOfMovieCredit {
+    var header: String
+    var items: [TheMovieCredit.Cast]
+}
+
+extension SectionOfMovieCredit: SectionModelType {
+    init(original: SectionOfMovieCredit, items: [TheMovieCredit.Cast]) {
+        self = original
+        self.items = items
+    }
 }

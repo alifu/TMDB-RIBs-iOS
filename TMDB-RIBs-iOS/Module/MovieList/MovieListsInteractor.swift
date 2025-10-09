@@ -23,6 +23,7 @@ protocol MovieListsPresentable: Presentable {
 
 protocol MovieListsListener: AnyObject {
     // TODO: Declare methods the interactor can invoke to communicate with other RIBs.
+    func didSelectMovie(_ movie: TheMovieLists.Wrapper)
 }
 
 final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, MovieListsInteractable, MovieListsPresentableListener {
@@ -71,6 +72,10 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
         case .popular:
             fetchPopularMovies()
         }
+    }
+    
+    func didSelectMovie(_ indexPath: IndexPath, item: TheMovieLists.Wrapper) {
+        self.listener?.didSelectMovie(item)
     }
     
     // MARK: - Private

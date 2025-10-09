@@ -75,6 +75,10 @@ extension HomeInteractor {
         self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
     }
     
+    func didSelectMovie(_ movie: TheMovieLists.Wrapper) {
+        self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
+    }
+    
     func goBackFromMovieDetail() {
         self.router?.detachMovieDetail()
     }

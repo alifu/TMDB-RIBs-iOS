@@ -20,6 +20,8 @@ protocol MovieDetailInfoPresentable: Presentable {
     func bindTab(_ data: Observable<[TheMovieDetailInfo.Tab]>)
     func bindSelectedTab(_ data: Observable<MovieDetailInfoType>)
     func bindAboutMovie(_ data: Observable<String?>)
+    func bindMovieReviews(_ data: Observable<[TheMovieReview.Result]>)
+    func bindMovieCredits(_ data: Observable<[TheMovieCredit.Cast]>)
 }
 
 protocol MovieDetailInfoListener: AnyObject {
@@ -36,6 +38,8 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     private var movieInfoTabData = theMovieDetailInfo
     private let aboutMovieRelay: BehaviorRelay<String?>
     private var tabType: BehaviorRelay<MovieDetailInfoType> = .init(value: .aboutMovie)
+    private var movieReviews: BehaviorRelay<[TheMovieReview.Result]> = .init(value: [])
+    private var movieCredits: BehaviorRelay<[TheMovieCredit.Cast]> = .init(value: [])
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -58,11 +62,41 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
         self.presenter.bindTab(movieInfoTab.asObservable())
         self.presenter.bindSelectedTab(tabType.asObservable())
         self.presenter.bindAboutMovie(aboutMovieRelay.asObservable())
+        self.presenter.bindMovieReviews(movieReviews.asObservable())
+        self.presenter.bindMovieCredits(movieCredits.asObservable())
     }
 
     override func willResignActive() {
         super.willResignActive()
         // TODO: Pause any business logic.
+    }
+    
+    private func fetchMovieReviews() {
+        apiManager.fetchMovieReviews(id: withMovieId, isLocal: true).subscribe(
+            onSuccess: { [weak self] response in
+                guard let `self` = self else { return }
+                self.movieReviews.accept(response.results)
+            },
+            onFailure: { [weak self] error in
+                guard let `self` = self else { return }
+                print("❌ API Error:", error)
+            }
+        )
+        .disposeOnDeactivate(interactor: self)
+    }
+    
+    private func fetchMovieCredits() {
+        apiManager.fetchMovieCredits(id: withMovieId, isLocal: true).subscribe(
+            onSuccess: { [weak self] response in
+                guard let `self` = self else { return }
+                self.movieCredits.accept(response.cast)
+            },
+            onFailure: { [weak self] error in
+                guard let `self` = self else { return }
+                print("❌ API Error:", error)
+            }
+        )
+        .disposeOnDeactivate(interactor: self)
     }
 }
 
@@ -72,5 +106,15 @@ extension MovieDetailInfoInteractor {
         movieInfoTabData.select(id: item.id)
         movieInfoTab.accept(movieInfoTabData)
         tabType.accept(item.type)
+        switch item.type {
+        case .cast:
+            if !movieCredits.value.isEmpty { return }
+            fetchMovieCredits()
+        case .reviews:
+            if !movieReviews.value.isEmpty { return }
+            fetchMovieReviews()
+        case .aboutMovie:
+            break
+        }
     }
 }

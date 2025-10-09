@@ -17,6 +17,7 @@ protocol MovieListsPresentableListener: AnyObject {
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
     func didSelectMovieList(_ indexPath: IndexPath, item: TheMovieLists.Tab)
+    func didSelectMovie(_ indexPath: IndexPath, item: TheMovieLists.Wrapper)
 }
 
 final class MovieListsViewController: UIViewController, MovieListsPresentable, MovieListsViewControllable {
@@ -118,6 +119,17 @@ final class MovieListsViewController: UIViewController, MovieListsPresentable, M
         .subscribe(onNext: { [weak self] indexPath, item in
             guard let `self` = self else { return }
             self.listener?.didSelectMovieList(indexPath, item: item)
+        })
+        .disposed(by: disposeBag)
+        
+        Observable.zip(
+            movieCollectionView.rx.itemSelected,
+            movieCollectionView.rx.modelSelected(TheMovieLists.Wrapper.self)
+        )
+        .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
+        .subscribe(onNext: { [weak self] indexPath, selected in
+            guard let `self` = self else { return }
+            self.listener?.didSelectMovie(indexPath, item: selected)
         })
         .disposed(by: disposeBag)
     }

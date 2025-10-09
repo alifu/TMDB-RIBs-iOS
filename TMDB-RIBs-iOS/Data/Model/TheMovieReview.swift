@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxDataSources
 
 struct TheMovieReview {
 
@@ -57,5 +58,17 @@ struct TheMovieReview {
             case avatarPath = "avatar_path"
             case rating
         }
+    }
+}
+
+struct SectionOfMovieReview {
+    var header: String
+    var items: [TheMovieReview.Result]
+}
+
+extension SectionOfMovieReview: SectionModelType {
+    init(original: SectionOfMovieReview, items: [TheMovieReview.Result]) {
+        self = original
+        self.items = items
     }
 }

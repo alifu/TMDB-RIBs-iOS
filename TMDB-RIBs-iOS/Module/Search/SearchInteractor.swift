@@ -16,7 +16,7 @@ protocol SearchRouting: ViewableRouting {
 protocol SearchPresentable: Presentable {
     var listener: SearchPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
-    func bindMovieItems(_ items: Observable<[MovieItem]>)
+    func bindMovieItems(_ items: Observable<[TheMovieSearchMovie.Result]>)
 }
 
 protocol SearchListener: AnyObject {
@@ -28,7 +28,7 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     weak var router: SearchRouting?
     weak var listener: SearchListener?
     private let apiManager: APIManager
-    private var movieItemRelay: BehaviorRelay<[MovieItem]> = .init(value: [])
+    private var movieItemRelay: BehaviorRelay<[TheMovieSearchMovie.Result]> = .init(value: [])
     
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -53,13 +53,11 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     }
     
     private func fetchSearchMovie(with query: String) {
-        
         let request = TheMovieSearchMovie.Request(page: 1, language: "en-US", includeAdult: true, query: query)
-        apiManager.fetchSearchMovieWithDetails(request: request)
+        apiManager.fetchSearchMovie(request: request)
             .subscribe(onSuccess: { [weak self] movies in
                 guard let self else { return }
-                print("Got \(movies.count) movies")
-                self.movieItemRelay.accept(movies)
+                self.movieItemRelay.accept(movies.results)
             }, onFailure: { error in
                 print("Error:", error)
             })
