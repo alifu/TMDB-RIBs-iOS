@@ -6,7 +6,9 @@
 //
 
 import RIBs
+import RxCocoa
 import RxSwift
+import UIKit
 
 protocol HomeRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
@@ -21,6 +23,7 @@ protocol HomeRouting: ViewableRouting {
 protocol HomePresentable: Presentable {
     var listener: HomePresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
+    func updateHeightMovieList(with height: Observable<CGFloat>)
 }
 
 protocol HomeListener: AnyObject {
@@ -32,6 +35,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     weak var router: HomeRouting?
     weak var listener: HomeListener?
     private let apiManager: APIManager
+    private var heightOfMovieList = PublishRelay<CGFloat>()
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -47,6 +51,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        self.presenter.updateHeightMovieList(with: heightOfMovieList.asObservable())
         attachPopularMovie()
         attachMovieLists()
     }
@@ -77,6 +82,10 @@ extension HomeInteractor {
     
     func didSelectMovie(_ movie: TheMovieLists.Wrapper) {
         self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
+    }
+    
+    func didUpdateHeight(with height: CGFloat) {
+        heightOfMovieList.accept(height)
     }
     
     func goBackFromMovieDetail() {

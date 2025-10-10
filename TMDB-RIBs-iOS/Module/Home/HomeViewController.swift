@@ -26,17 +26,19 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = ColorUtils.primary
-        self.navigationController?.navigationBar.isHidden = true
-        
         setupUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false
+        self.navigationController?.navigationBar.isHidden = true
     }
     
     // MARK: - Private
+    
+    private let scrollView = UIScrollView()
+    private let contentStack = UIStackView()
     
     private let headerTitleLabel: UILabel = {
         let label = UILabel()
@@ -65,33 +67,45 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
     }()
     
     private func setupUI() {
-        self.view.addSubview(headerTitleLabel)
-        self.view.addSubview(searchBox)
-        self.view.addSubview(popularMoviewContainer)
-        self.view.addSubview(movieListContainer)
+        self.view.addSubview(scrollView)
+        scrollView.snp.makeConstraints { $0.edges.equalToSuperview() }
+        
+        scrollView.addSubview(contentStack)
+        contentStack.axis = .vertical
+        contentStack.spacing = 20
+        contentStack.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(scrollView.snp.width)
+        }
+        
+        let headView = UIView()
+        headView.addSubview(headerTitleLabel)
+        headView.addSubview(searchBox)
+        
+        contentStack.addArrangedSubview(headView)
+        headView.snp.makeConstraints { $0.height.greaterThanOrEqualTo(10) }
+        
+        contentStack.addArrangedSubview(popularMoviewContainer)
+        contentStack.addArrangedSubview(movieListContainer)
         
         headerTitleLabel.snp.makeConstraints {
-            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.top.equalTo(headView.snp.top)
+            $0.leading.equalTo(headView.snp.leading).offset(16)
+            $0.trailing.equalTo(headView.snp.trailing).offset(-16)
+            $0.height.greaterThanOrEqualTo(10)
         }
         
         searchBox.snp.makeConstraints {
             $0.top.equalTo(headerTitleLabel.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.leading.equalTo(headView.snp.leading).offset(16)
+            $0.trailing.equalTo(headView.snp.trailing).offset(-16)
             $0.height.equalTo(42)
+            $0.bottom.equalTo(headView.snp.bottom)
         }
         
-        popularMoviewContainer.snp.makeConstraints {
-            $0.top.equalTo(searchBox.snp.bottom).offset(24)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(250)
-        }
+        popularMoviewContainer.snp.makeConstraints { $0.height.equalTo(250) }
         
-        movieListContainer.snp.makeConstraints {
-            $0.top.equalTo(popularMoviewContainer.snp.bottom).offset(16)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.bottom.equalToSuperview()
-        }
+        movieListContainer.snp.makeConstraints { $0.height.greaterThanOrEqualTo(200) }
         
         searchBox.rx.tapGesture()
             .when(.recognized)
@@ -101,6 +115,20 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
                     self.tabBarController?.selectedIndex = 2
                 } else {
                     self.tabBarController?.selectedIndex = 1
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func updateHeightMovieList(with height: Observable<CGFloat>) {
+        height
+            .subscribe(onNext: { [weak self] height in
+                guard let `self` = self else { return }
+                self.movieListContainer.snp.updateConstraints {
+                    $0.height.greaterThanOrEqualTo(height)
+                }
+                UIView.animate(withDuration: 0.1) {
+                    self.view.layoutIfNeeded()
                 }
             })
             .disposed(by: disposeBag)

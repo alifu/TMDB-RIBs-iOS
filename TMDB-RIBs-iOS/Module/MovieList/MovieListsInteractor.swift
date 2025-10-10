@@ -25,6 +25,7 @@ protocol MovieListsPresentable: Presentable {
 protocol MovieListsListener: AnyObject {
     // TODO: Declare methods the interactor can invoke to communicate with other RIBs.
     func didSelectMovie(_ movie: TheMovieLists.Wrapper)
+    func didUpdateHeight(with height: CGFloat)
 }
 
 final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, MovieListsInteractable, MovieListsPresentableListener {
@@ -79,6 +80,10 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     func didSelectMovie(_ indexPath: IndexPath, item: TheMovieLists.Wrapper) {
         self.listener?.didSelectMovie(item)
+    }
+    
+    func didUpdateHeight(with height: CGFloat) {
+        self.listener?.didUpdateHeight(with: height)
     }
     
     // MARK: - Private

@@ -18,6 +18,7 @@ protocol MovieListsPresentableListener: AnyObject {
     // interactor class.
     func didSelectMovieList(_ indexPath: IndexPath, item: TheMovieLists.Tab)
     func didSelectMovie(_ indexPath: IndexPath, item: TheMovieLists.Wrapper)
+    func didUpdateHeight(with height: CGFloat)
 }
 
 final class MovieListsViewController: UIViewController, MovieListsPresentable, MovieListsViewControllable {
@@ -88,6 +89,7 @@ final class MovieListsViewController: UIViewController, MovieListsPresentable, M
         collectionView.backgroundColor = .clear
         collectionView.contentInset.left = 16
         collectionView.showsVerticalScrollIndicator = false
+        collectionView.isScrollEnabled = false
         return collectionView
     }()
     
@@ -109,6 +111,17 @@ final class MovieListsViewController: UIViewController, MovieListsPresentable, M
             .disposed(by: disposeBag)
         
         movieCollectionView.rx.setDelegate(self)
+            .disposed(by: disposeBag)
+        
+        movieCollectionView.rx
+            .observe(CGSize.self, "contentSize")
+            .compactMap { $0 }
+            .distinctUntilChanged()
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] size in
+                guard let `self` = self else { return }
+                self.listener?.didUpdateHeight(with: size.height + 53)
+            })
             .disposed(by: disposeBag)
         
         Observable.zip(
