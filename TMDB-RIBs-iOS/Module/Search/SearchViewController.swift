@@ -157,6 +157,12 @@ extension SearchViewController {
         }
     }
     
+    func errorViewVisible(_ model: Observable<ErrorViewModel?>) {
+        model
+            .bind(to: self.view.rx.errorView)
+            .disposed(by: disposeBag)
+    }
+    
     func loading(_ isLoading: Observable<Bool>) {
         isLoading
             .bind(to: self.view.rx.loaderVisible)

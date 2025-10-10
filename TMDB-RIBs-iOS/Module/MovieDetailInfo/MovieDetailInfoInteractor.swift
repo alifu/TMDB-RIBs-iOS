@@ -23,6 +23,7 @@ protocol MovieDetailInfoPresentable: Presentable {
     func bindMovieReviews(_ data: Observable<[TheMovieReview.Result]>)
     func bindMovieCredits(_ data: Observable<[TheMovieCredit.Cast]>)
     func loading(_ isLoading: Observable<Bool>)
+    func errorViewVisible(_ model: Observable<ErrorViewModel?>)
 }
 
 protocol MovieDetailInfoListener: AnyObject {
@@ -42,6 +43,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     private var movieReviews: BehaviorRelay<[TheMovieReview.Result]> = .init(value: [])
     private var movieCredits: BehaviorRelay<[TheMovieCredit.Cast]> = .init(value: [])
     private var isLoading = PublishRelay<Bool>()
+    private let errorState = BehaviorRelay<ErrorViewModel?>(value: nil)
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -67,6 +69,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
         self.presenter.bindAboutMovie(aboutMovieRelay.asObservable())
         self.presenter.bindMovieReviews(movieReviews.asObservable())
         self.presenter.bindMovieCredits(movieCredits.asObservable())
+        self.presenter.errorViewVisible(errorState.asObservable())
     }
 
     override func willResignActive() {
@@ -76,11 +79,16 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     
     private func fetchMovieReviews() {
         isLoading.accept(true)
+        errorState.accept(nil)
         apiManager.fetchMovieReviews(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 self.isLoading.accept(false)
-                self.movieReviews.accept(response.results)
+                if response.totalResults == 0 {
+                    self.emptyData(from: "review")
+                } else {
+                    self.movieReviews.accept(response.results)
+                }
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
@@ -93,11 +101,16 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     
     private func fetchMovieCredits() {
         isLoading.accept(true)
+        errorState.accept(nil)
         apiManager.fetchMovieCredits(id: withMovieId).subscribe(
             onSuccess: { [weak self] response in
                 guard let `self` = self else { return }
                 self.isLoading.accept(false)
-                self.movieCredits.accept(response.cast)
+                if response.cast.isEmpty {
+                    self.emptyData(from: "cast")
+                } else {
+                    self.movieCredits.accept(response.cast)
+                }
             },
             onFailure: { [weak self] error in
                 guard let `self` = self else { return }
@@ -107,6 +120,16 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
         )
         .disposeOnDeactivate(interactor: self)
     }
+    
+    private func emptyData(from info: String) {
+        errorState.accept(
+            ErrorViewModel(
+                image: UIImage(named: "empty-box"),
+                title: "There is no \(info) yet!",
+                subtitle: ""
+            )
+        )
+    }
 }
 
 extension MovieDetailInfoInteractor {
@@ -115,6 +138,7 @@ extension MovieDetailInfoInteractor {
         movieInfoTabData.select(id: item.id)
         movieInfoTab.accept(movieInfoTabData)
         tabType.accept(item.type)
+        errorState.accept(nil)
         switch item.type {
         case .cast:
             if !movieCredits.value.isEmpty { return }

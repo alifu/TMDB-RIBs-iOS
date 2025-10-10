@@ -70,6 +70,12 @@ final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPres
             .disposed(by: disposeBag)
     }
     
+    func errorViewVisible(_ model: Observable<ErrorViewModel?>) {
+        model
+            .bind(to: self.view.rx.errorView)
+            .disposed(by: disposeBag)
+    }
+    
     private let tabDataSource = RxCollectionViewSectionedReloadDataSource<SectionOfMovieDetailInfo>(
         configureCell: { _, collectionView, indexPath, item in
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MiniTabCell.idView(), for: indexPath) as? MiniTabCell {

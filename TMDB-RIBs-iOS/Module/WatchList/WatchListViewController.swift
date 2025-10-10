@@ -44,6 +44,12 @@ final class WatchListViewController: UIViewController, WatchListPresentable, Wat
             .disposed(by: disposeBag)
     }
     
+    func errorViewVisible(_ model: Observable<ErrorViewModel?>) {
+        model
+            .bind(to: self.view.rx.errorView)
+            .disposed(by: disposeBag)
+    }
+    
     private let dataSource = RxTableViewSectionedReloadDataSource<SectionOfWatchListMovie>(
         configureCell: { _, tableView, indexPath, item in
             if let cell = tableView.dequeueReusableCell(withIdentifier: MovieCardCell.idView(), for: indexPath) as? MovieCardCell {
