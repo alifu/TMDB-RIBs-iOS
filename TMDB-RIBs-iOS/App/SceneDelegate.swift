@@ -41,6 +41,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let launchRouter = rootBuilder.build()
         self.launchRouter = launchRouter
         
+        let searchTextFieldAppearance = UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self])
+        searchTextFieldAppearance.textColor = .white
+        searchTextFieldAppearance.tintColor = .white
+        searchTextFieldAppearance.backgroundColor = ColorUtils.grey
+        
         if #available(iOS 26.0, *) {
             let appearance = UITabBarAppearance()
             appearance.shadowColor = .clear

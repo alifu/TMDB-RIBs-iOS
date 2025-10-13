@@ -12,6 +12,13 @@ import RxSwift
 import SnapKit
 import UIKit
 
+extension UISearchBar {
+    func setInputColor(_ color: UIColor) {
+        let textField = self.value(forKey: "searchField") as? UITextField
+        textField?.textColor = color
+    }
+}
+
 protocol SearchPresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
@@ -35,6 +42,7 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         // Configure search controller
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search movies..."
+        searchController.searchBar.searchTextField.textColor = .green
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
         
@@ -46,7 +54,16 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
+        if #available(iOS 26.0, *) {
+            self.navigationController?.navigationBar.isHidden = true
+        } else {
+            self.navigationController?.navigationBar.isHidden = false
+            self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+            self.navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
+            self.title = "Search"
+            self.navigationController?.navigationItem.largeTitleDisplayMode = .always
+            
+        }
         self.tabBarController?.tabBar.isHidden = false
     }
     
@@ -83,18 +100,26 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
     }()
     
     private func setupUI() {
-        self.view.addSubview(headerView)
-        self.view.addSubview(tableView)
-        
-        headerView.snp.makeConstraints {
-            $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
-            $0.leading.trailing.equalToSuperview()
-            $0.height.equalTo(44)
-        }
-        
-        tableView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
-            $0.leading.trailing.bottom.equalToSuperview()
+        if #available(iOS 26.0, *) {
+            self.view.addSubview(headerView)
+            self.view.addSubview(tableView)
+            
+            headerView.snp.makeConstraints {
+                $0.top.equalTo(self.view.safeAreaLayoutGuide.snp.top)
+                $0.leading.trailing.equalToSuperview()
+                $0.height.equalTo(44)
+            }
+            
+            tableView.snp.makeConstraints {
+                $0.top.equalTo(headerView.snp.bottom)
+                $0.leading.trailing.bottom.equalToSuperview()
+            }
+        } else {
+            self.view.addSubview(tableView)
+            
+            tableView.snp.makeConstraints {
+                $0.edges.equalToSuperview()
+            }
         }
         
         tableView.rx.setDelegate(self)
