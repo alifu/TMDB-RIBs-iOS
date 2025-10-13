@@ -54,6 +54,12 @@ Root RIB
 | **Builder** | Assembles RIB components with dependencies |
 | **Presenter / ViewController** | Displays data & binds to Interactor |
 
+#### Communication between RIBs
+
+| One-way | Two-way |
+|------------|----------------|
+|<img src="doc/one-way comm.png" alt="drawing" width="300"/>|<img src="doc/two-way comm.png" alt="drawing" width="300"/>|
+
 ---
 
 ## ⚙️ Tech Stack
