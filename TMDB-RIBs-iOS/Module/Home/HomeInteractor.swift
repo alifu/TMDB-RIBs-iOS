@@ -23,6 +23,8 @@ protocol HomeRouting: ViewableRouting {
 protocol HomePresentable: Presentable {
     var listener: HomePresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
+    var didLoadMoreTrigger: PublishSubject<Void> { get }
+    
     func updateHeightMovieList(with height: Observable<CGFloat>)
 }
 
@@ -36,14 +38,19 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     weak var listener: HomeListener?
     private let apiManager: APIManager
     private var heightOfMovieList = PublishRelay<CGFloat>()
+    private let loadMoreTrigger: PublishRelay<Void>
+    private let isLoadingRelay: BehaviorRelay<Bool>
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
     init(
         presenter: HomePresentable,
-        apiManager: APIManager
+        apiManager: APIManager,
+        dependency: MovieListsDependency
     ) {
         self.apiManager = apiManager
+        self.loadMoreTrigger = dependency.loadMoreTrigger
+        self.isLoadingRelay = dependency.isLoadingRelay
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -51,6 +58,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     override func didBecomeActive() {
         super.didBecomeActive()
         // TODO: Implement business logic here.
+        bindLoadMore()
         self.presenter.updateHeightMovieList(with: heightOfMovieList.asObservable())
         attachPopularMovie()
         attachMovieLists()
@@ -71,6 +79,15 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         if let child = router?.attachMovieListsChild(apiManager: apiManager) {
             child.listener = self
         }
+    }
+    
+    private func bindLoadMore() {
+        self.presenter.didLoadMoreTrigger
+            .withLatestFrom(isLoadingRelay)
+            .filter { !$0 } // only trigger when child not loading
+            .map { _ in () }
+            .bind(to: loadMoreTrigger)
+            .disposeOnDeactivate(interactor: self)
     }
 }
 

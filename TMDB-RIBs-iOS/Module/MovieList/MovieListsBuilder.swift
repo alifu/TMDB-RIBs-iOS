@@ -6,15 +6,24 @@
 //
 
 import RIBs
+import RxCocoa
 
 protocol MovieListsDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
     // created by this RIB.
+    var loadMoreTrigger: PublishRelay<Void> { get }
+    var isLoadingRelay: BehaviorRelay<Bool> { get }
 }
 
-final class MovieListsComponent: Component<MovieListsDependency> {
+final class MovieListsComponent: Component<MovieListsDependency>, MovieListsDependency {
 
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
+    internal var loadMoreTrigger: RxRelay.PublishRelay<Void> {
+        dependency.loadMoreTrigger
+    }
+    internal var isLoadingRelay: RxRelay.BehaviorRelay<Bool> {
+        dependency.isLoadingRelay
+    }
 }
 
 // MARK: - Builder
@@ -34,7 +43,8 @@ final class MovieListsBuilder: Builder<MovieListsDependency>, MovieListsBuildabl
         let viewController = MovieListsViewController()
         let interactor = MovieListsInteractor(
             presenter: viewController,
-            apiManager: apiManager
+            apiManager: apiManager,
+            dependecy: component
         )
         interactor.listener = listener
         return MovieListsRouter(interactor: interactor, viewController: viewController)

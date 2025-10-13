@@ -21,6 +21,7 @@ protocol HomePresentableListener: AnyObject {
 final class HomeViewController: UIViewController, HomePresentable, HomeViewControllable {
 
     weak var listener: HomePresentableListener?
+    var didLoadMoreTrigger = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -117,6 +118,20 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
                     self.tabBarController?.selectedIndex = 1
                 }
             })
+            .disposed(by: disposeBag)
+        
+        scrollView.rx.contentOffset
+            .map { [weak self] offset -> Bool in
+                guard let self = self else { return false }
+                let visibleHeight = self.scrollView.frame.height
+                let y = offset.y + visibleHeight
+                let threshold = self.scrollView.contentSize.height - 200
+                return y > threshold
+            }
+            .distinctUntilChanged()
+            .filter { $0 } // only when crossing threshold
+            .map { _ in () }
+            .bind(to: didLoadMoreTrigger)
             .disposed(by: disposeBag)
     }
     

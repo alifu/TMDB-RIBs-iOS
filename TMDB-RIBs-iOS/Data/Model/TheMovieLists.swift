@@ -28,9 +28,15 @@ struct TheMovieLists {
         }
     }
     
-    struct Wrapper {
+    struct Wrapper: IdentifiableType, Equatable {
         let id: Int
         let posterPath: String?
+        
+        var identity: Int { id }
+        
+        static func == (lhs: Wrapper, rhs: Wrapper) -> Bool {
+            return lhs.id == rhs.id
+        }
     }
 }
 
@@ -61,12 +67,17 @@ extension SectionOfMovieLists: SectionModelType {
     }
 }
 
-struct SectionOfMovies {
+struct SectionOfMovies: AnimatableSectionModelType {
     var header: String
     var items: [TheMovieLists.Wrapper]
-}
-
-extension SectionOfMovies: SectionModelType {
+    
+    var identity: String { header }
+    
+    init(header: String, items: [TheMovieLists.Wrapper]) {
+        self.header = header
+        self.items = items
+    }
+    
     init(original: SectionOfMovies, items: [TheMovieLists.Wrapper]) {
         self = original
         self.items = items

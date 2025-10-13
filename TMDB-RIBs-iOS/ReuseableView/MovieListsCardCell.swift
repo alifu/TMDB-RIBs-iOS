@@ -32,6 +32,7 @@ final class MovieListsCardCell: UICollectionViewCell {
         imageView.contentMode = .scaleToFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 16
+        imageView.backgroundColor = .black
         return imageView
     }()
     

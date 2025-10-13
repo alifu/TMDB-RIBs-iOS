@@ -56,7 +56,7 @@ final class MovieListsViewController: UIViewController, MovieListsPresentable, M
         }
     )
     
-    private let moviesDataSource = RxCollectionViewSectionedReloadDataSource<SectionOfMovies>(
+    private let moviesDataSource = RxCollectionViewSectionedAnimatedDataSource<SectionOfMovies>(
         configureCell: { _, collectionView, indexPath, item in
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieListsCardCell.idView(), for: indexPath) as? MovieListsCardCell {
                 cell.setupContent(item: item)
@@ -167,6 +167,11 @@ extension MovieListsViewController {
     
     func loading(_ isLoading: Observable<Bool>) {
         isLoading
+            .observe(on: MainScheduler.instance)
+            .do(onNext: { [weak self] loading in
+                guard let `self` = self else { return }
+                self.movieCollectionView.isHidden = loading
+            })
             .bind(to: self.view.rx.loaderVisible)
             .disposed(by: disposeBag)
     }

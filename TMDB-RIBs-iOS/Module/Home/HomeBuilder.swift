@@ -6,15 +6,18 @@
 //
 
 import RIBs
+import RxCocoa
 
 protocol HomeDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
     // created by this RIB.
 }
 
-final class HomeComponent: Component<HomeDependency> {
+final class HomeComponent: Component<HomeDependency>, MovieListsDependency {
 
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
+    let loadMoreTrigger = PublishRelay<Void>()
+    let isLoadingRelay = BehaviorRelay<Bool>(value: false)
 }
 
 // MARK: - Builder
@@ -34,7 +37,8 @@ final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
         let viewController = HomeViewController()
         let interactor = HomeInteractor(
             presenter: viewController,
-            apiManager: apiManager
+            apiManager: apiManager,
+            dependency: component
         )
         let popularMovieBuilder = PopularMovieBuilder(dependency: component)
         let movieListsBuilder = MovieListsBuilder(dependency: component)
