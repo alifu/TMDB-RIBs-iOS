@@ -12,6 +12,7 @@ import RxSwift
 
 enum TheMovieAPI {
     
+    case trendingToday(request: TheMovieTrendingToday.Request, isLocal: Bool = false)
     case popular(request: TheMoviePopular.Request, isLocal: Bool = false)
     case nowPlaying(request: TheMovieNowPlaying.Request, isLocal: Bool = false)
     case upComing(request: TheMovieUpComing.Request, isLocal: Bool = false)
@@ -29,7 +30,8 @@ extension TheMovieAPI: TargetType {
     
     var baseURL: URL {
         switch self {
-        case .popular(_, let isLocal),
+        case .trendingToday(_, let isLocal),
+                .popular(_, let isLocal),
                 .nowPlaying(_, let isLocal),
                 .upComing(_, let isLocal),
                 .topRated(_, let isLocal),
@@ -50,6 +52,8 @@ extension TheMovieAPI: TargetType {
     }
     var path: String {
         switch self {
+        case .trendingToday:
+            return "/trending/movie/day"
         case .popular:
             return "/movie/popular"
         case .nowPlaying:
@@ -86,6 +90,11 @@ extension TheMovieAPI: TargetType {
     var sampleData: Data { Data() }
     var task: Task {
         switch self {
+        case .trendingToday(let request, _):
+            return .requestParameters(
+                parameters: ["language": request.language, "page": request.page],
+                encoding: URLEncoding.default
+            )
         case .popular(let request, _):
             return .requestParameters(
                 parameters: ["language": request.language, "page": request.page],
@@ -164,6 +173,7 @@ extension TheMovieAPI: TargetType {
 
 protocol TheMovieProtocol {
     
+    func fetchTrendingTodayMovie(request: TheMovieTrendingToday.Request, isLocal: Bool) -> Single<TheMovieTrendingToday.Response>
     func fetchPopularMovie(request: TheMoviePopular.Request, isLocal: Bool) -> Single<TheMoviePopular.Response>
     func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request, isLocal: Bool) -> Single<TheMovieNowPlaying.Response>
     func fetchUpComingMovie(request: TheMovieUpComing.Request, isLocal: Bool) -> Single<TheMovieUpComing.Response>
@@ -188,6 +198,12 @@ struct APIManager {
 }
 
 extension APIManager: TheMovieProtocol {
+    
+    func fetchTrendingTodayMovie(request: TheMovieTrendingToday.Request, isLocal: Bool = false) -> Single<TheMovieTrendingToday.Response> {
+        return APIManager.provider.rx
+            .request(.trendingToday(request: request, isLocal: isLocal))
+            .map(TheMovieTrendingToday.Response.self)
+    }
     
     func fetchPopularMovie(request: TheMoviePopular.Request, isLocal: Bool = false) -> Single<TheMoviePopular.Response> {
         return APIManager.provider.rx

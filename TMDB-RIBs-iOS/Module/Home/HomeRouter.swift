@@ -7,22 +7,22 @@
 
 import RIBs
 
-protocol HomeInteractable: Interactable, PopularMovieListener, MovieListsListener, MovieDetailListener {
+protocol HomeInteractable: Interactable, FeaturedMovieListener, MovieListsListener, MovieDetailListener {
     var router: HomeRouting? { get set }
     var listener: HomeListener? { get set }
 }
 
 protocol HomeViewControllable: ViewControllable {
     // TODO: Declare methods the router invokes to manipulate the view hierarchy.
-    func attachPopularMovieView(viewController: ViewControllable?)
+    func attachFeaturedMovieView(viewController: ViewControllable?)
     func attachMovieListsView(viewController: ViewControllable?)
     func openMovieDetail(viewController: ViewControllable?)
 }
 
 final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, HomeRouting {
     
-    private let popularMovieBuilder: PopularMovieBuildable
-    private var popularMovie: PopularMovieRouting?
+    private let featuredMovieBuilder: FeaturedMovieBuilder
+    private var featuredMovie: FeaturedMovieRouting?
     private let movieListsBuilder: MovieListsBuildable
     private var movieLists: MovieListsRouting?
     private let movieDetailBuilder: MovieDetailBuildable
@@ -32,30 +32,30 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
     init(
         interactor: HomeInteractable,
         viewController: HomeViewControllable,
-        popularMovieBuilder: PopularMovieBuildable,
+        featuredMovieBuilder: FeaturedMovieBuilder,
         movieListsBuilder: MovieListsBuildable,
         movieDetailBuilder: MovieDetailBuildable
     ) {
-        self.popularMovieBuilder = popularMovieBuilder
+        self.featuredMovieBuilder = featuredMovieBuilder
         self.movieListsBuilder = movieListsBuilder
         self.movieDetailBuilder = movieDetailBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
     
-    func attachPopularMovieChild(apiManager: APIManager) -> (any PopularMovieInteractable)? {
-        guard popularMovie == nil else { return popularMovie?.interactable as? PopularMovieInteractable }
-        let childRouter = popularMovieBuilder.build(withListener: interactor, apiManager: apiManager)
-        popularMovie = childRouter
+    func attachFeaturedMovieChild(apiManager: APIManager) -> (any FeaturedMovieInteractable)? {
+        guard featuredMovie == nil else { return featuredMovie?.interactable as? FeaturedMovieInteractable }
+        let childRouter = featuredMovieBuilder.build(withListener: interactor, apiManager: apiManager)
+        featuredMovie = childRouter
         attachChild(childRouter)
-        viewController.attachPopularMovieView(viewController: popularMovie?.viewControllable)
-        return childRouter.interactable as? PopularMovieInteractable
+        viewController.attachFeaturedMovieView(viewController: featuredMovie?.viewControllable)
+        return childRouter.interactable as? FeaturedMovieInteractable
     }
     
-    func detachPopularMovie() {
-        if let detach = popularMovie {
+    func detachFeaturedMovie() {
+        if let detach = featuredMovie {
             detachChild(detach)
-            popularMovie = nil
+            featuredMovie = nil
         }
     }
     

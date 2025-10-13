@@ -9,7 +9,7 @@ import Nuke
 import SnapKit
 import UIKit
 
-final class PopularMovieCell: UICollectionViewCell {
+final class FeaturedMovieCell: UICollectionViewCell {
     
     private var currentTask: ImageTask?
     
@@ -62,7 +62,7 @@ final class PopularMovieCell: UICollectionViewCell {
         }
     }
     
-    func setupContent(indexPath: IndexPath, item: TheMoviePopular.Result) {
+    func setupContent(indexPath: IndexPath, item: TheMovieTrendingToday.Result) {
         
         let attributes: [NSAttributedString.Key: Any] = [
             .strokeColor: ColorUtils.blue,

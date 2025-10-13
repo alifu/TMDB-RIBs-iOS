@@ -40,14 +40,14 @@ final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
             apiManager: apiManager,
             dependency: component
         )
-        let popularMovieBuilder = PopularMovieBuilder(dependency: component)
+        let featuredMovieBuilder = FeaturedMovieBuilder(dependency: component)
         let movieListsBuilder = MovieListsBuilder(dependency: component)
         let movieDetailBuilder = MovieDetailBuilder(dependency: component)
         interactor.listener = listener
         return HomeRouter(
             interactor: interactor,
             viewController: viewController,
-            popularMovieBuilder: popularMovieBuilder,
+            featuredMovieBuilder: featuredMovieBuilder,
             movieListsBuilder: movieListsBuilder,
             movieDetailBuilder: movieDetailBuilder
         )

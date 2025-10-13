@@ -12,8 +12,8 @@ import UIKit
 
 protocol HomeRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
-    func attachPopularMovieChild(apiManager: APIManager) -> PopularMovieInteractable?
-    func detachPopularMovie()
+    func attachFeaturedMovieChild(apiManager: APIManager) -> FeaturedMovieInteractable?
+    func detachFeaturedMovie()
     func attachMovieListsChild(apiManager: APIManager) -> MovieListsInteractable?
     func detachMovieLists()
     func openMovieDetail(withId: Int, apiManager: APIManager)
@@ -60,7 +60,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         // TODO: Implement business logic here.
         bindLoadMore()
         self.presenter.updateHeightMovieList(with: heightOfMovieList.asObservable())
-        attachPopularMovie()
+        attachFeaturedMovie()
         attachMovieLists()
     }
 
@@ -69,8 +69,8 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         // TODO: Pause any business logic.
     }
     
-    private func attachPopularMovie() {
-        if let child = router?.attachPopularMovieChild(apiManager: apiManager) {
+    private func attachFeaturedMovie() {
+        if let child = router?.attachFeaturedMovieChild(apiManager: apiManager) {
             child.listener = self
         }
     }
@@ -93,7 +93,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
 
 extension HomeInteractor {
     
-    func didSelectPopularMovie(_ movie: TheMoviePopular.Result) {
+    func didSelectFeaturedMovie(_ movie: TheMovieTrendingToday.Result) {
         self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
     }
     

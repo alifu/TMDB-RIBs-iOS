@@ -152,7 +152,7 @@ final class HomeViewController: UIViewController, HomePresentable, HomeViewContr
 
 extension HomeViewController {
     
-    func attachPopularMovieView(viewController: ViewControllable?) {
+    func attachFeaturedMovieView(viewController: ViewControllable?) {
         if let viewController {
             self.addChild(viewController.uiviewController)
             popularMoviewContainer.addSubview(viewController.uiviewController.view)
