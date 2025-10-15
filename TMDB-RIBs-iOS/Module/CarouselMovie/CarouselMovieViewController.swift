@@ -1,8 +1,8 @@
 //
-//  FeaturedMovieViewController.swift
+//  CarouselMovieViewController.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif on 13/10/25.
+//  Created by Alif on 14/10/25.
 //
 
 import RIBs
@@ -12,16 +12,16 @@ import RxSwift
 import SnapKit
 import UIKit
 
-protocol FeaturedMoviePresentableListener: AnyObject {
+protocol CarouselMoviePresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
-    func didSelectedMovie(_ movie: TheMovieTrendingToday.Result)
+    func didSelectVideo(url: URL)
 }
 
-final class FeaturedMovieViewController: UIViewController, FeaturedMoviePresentable, FeaturedMovieViewControllable {
+final class CarouselMovieViewController: UIViewController, CarouselMoviePresentable, CarouselMovieViewControllable {
 
-    weak var listener: FeaturedMoviePresentableListener?
+    weak var listener: CarouselMoviePresentableListener?
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -31,17 +31,17 @@ final class FeaturedMovieViewController: UIViewController, FeaturedMoviePresenta
         setupUI()
     }
     
-    func bindFeaturedMovie(_ movies: Observable<[TheMovieTrendingToday.Result]>) {
+    func bindCarousel(_ movies: Observable<[TheMovieCaraousel]>) {
         movies
-            .map { [SectionOfTrendingTodayMovie(header: "featured", items: $0)] }
+            .map { [SectionOfMovieCarousel(header: "featured", items: $0)] }
             .bind(to: collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
     }
     
-    private let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfTrendingTodayMovie>(
+    private let dataSource = RxCollectionViewSectionedAnimatedDataSource<SectionOfMovieCarousel>(
         configureCell: { _, collectionView, indexPath, item in
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FeaturedMovieCell.idView(), for: indexPath) as? FeaturedMovieCell {
-                cell.setupContent(indexPath: indexPath, item: item)
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.idView(), for: indexPath) as? MovieCarouselCell {
+                cell.configure(with: item)
                 return cell
             }
             return UICollectionViewCell()
@@ -54,9 +54,9 @@ final class FeaturedMovieViewController: UIViewController, FeaturedMoviePresenta
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(FeaturedMovieCell.self, forCellWithReuseIdentifier: FeaturedMovieCell.idView())
+        collectionView.register(MovieCarouselCell.self, forCellWithReuseIdentifier: MovieCarouselCell.idView())
         collectionView.backgroundColor = .clear
-        collectionView.contentInset.left = 16
+        collectionView.isPagingEnabled = true
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
@@ -73,30 +73,22 @@ final class FeaturedMovieViewController: UIViewController, FeaturedMoviePresenta
         
         Observable.zip(
             collectionView.rx.itemSelected,
-            collectionView.rx.modelSelected(TheMovieTrendingToday.Result.self)
+            collectionView.rx.modelSelected(TheMovieCaraousel.self)
         )
         .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
         .subscribe(onNext: { [weak self] indexPath, selected in
             guard let `self` = self else { return }
-            self.listener?.didSelectedMovie(selected)
+            if case .video(let video) = selected, let url = video.videoURL {
+                self.listener?.didSelectVideo(url: url)
+            }
         })
         .disposed(by: disposeBag)
     }
 }
 
-extension FeaturedMovieViewController: UICollectionViewDelegateFlowLayout {
+extension CarouselMovieViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = RatioUtils.aspectRatioOfPoster(withHeight: 226) + 32
-        return CGSize(width: width, height: 250)
-    }
-}
-
-extension FeaturedMovieViewController {
-    
-    func loading(_ isLoading: Observable<Bool>) {
-        isLoading
-            .bind(to: self.view.rx.loaderVisible)
-            .disposed(by: disposeBag)
+        return CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
     }
 }

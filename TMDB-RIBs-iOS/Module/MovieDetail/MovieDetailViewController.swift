@@ -47,9 +47,9 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
         return view
     }()
     
-    private let backDropImageView: UIImageView = {
-        let view = UIImageView()
-        view.contentMode = .scaleAspectFill
+    private let carouselContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
         view.clipsToBounds = true
         view.layer.cornerRadius = 16
         view.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
@@ -144,7 +144,7 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
     private func setupUI() {
         [
             headerView,
-            backDropImageView,
+            carouselContainer,
             posterImageView,
             titleLabel,
             overviewContainer,
@@ -172,7 +172,7 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
         }
         
         let heightOfBackDrop: CGFloat = RatioUtils.aspectRatioOFBackDrop(withWidth: UIScreen.safeWidth)
-        backDropImageView.snp.makeConstraints {
+        carouselContainer.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom)
             $0.leading.trailing.equalToSuperview()
             $0.height.equalTo(heightOfBackDrop)
@@ -183,7 +183,7 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
             $0.height.equalTo(heightOfPoster)
             $0.width.equalTo(100)
             $0.leading.equalToSuperview().inset(20)
-            $0.centerY.equalTo(backDropImageView.snp.bottom)
+            $0.centerY.equalTo(carouselContainer.snp.bottom)
         }
         
         titleLabel.snp.makeConstraints {
@@ -279,29 +279,7 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
             .disposed(by: disposeBag)
     }
     
-    private func loadImages(with data: Event<TheMovieDetail.Response>) {
-        currentTaskBackDrop?.cancel()
-        if let urlString = data.element?.backdropPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
-            let request = ImageRequest(url: url)
-            backDropImageView.image = nil
-            currentTaskBackDrop = ImagePipeline.shared.loadImage(with: request) { [weak self] result in
-                guard let self else { return }
-                switch result {
-                case let .success(response):
-                    UIView.transition(
-                        with: self.backDropImageView,
-                        duration: 0.25,
-                        options: .transitionCrossDissolve,
-                        animations: {
-                            self.backDropImageView.image = response.image
-                        }
-                    )
-                case .failure(_):
-                    self.backDropImageView.image = nil
-                }
-            }
-        }
-        
+    private func loadImages(with data: Event<TheMovieDetail.Response>) {        
         currentTaskPoster?.cancel()
         if let urlString = data.element?.posterPath, let url = URL(string: "\(Natrium.Config.baseImageW500Url)\(urlString)") {
             let request = ImageRequest(url: url)
@@ -325,9 +303,10 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
         }
     }
     
-    func bindContent(with detail: Observable<TheMovieDetail.Response>) {
+    func bindContent(with detail: Observable<TheMovieDetail.Response?>) {
         detail
-            .map { $0 }
+            .compactMap { $0 }
+            .observe(on: MainScheduler.instance)
             .subscribe { [weak self] data in
                 guard let `self` = self else { return }
                 self.loadImages(with: data)
@@ -371,6 +350,25 @@ extension MovieDetailViewController {
                 make.edges.equalToSuperview()
             }
             viewController.uiviewController.didMove(toParent: self)
+        }
+    }
+    
+    func attachCarousel(viewController: ViewControllable?) {
+        if let viewController {
+            self.addChild(viewController.uiviewController)
+            carouselContainer.addSubview(viewController.uiviewController.view)
+            viewController.uiviewController.view.translatesAutoresizingMaskIntoConstraints = false
+            viewController.uiviewController.view.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+            viewController.uiviewController.didMove(toParent: self)
+        }
+    }
+    
+    func attachWebPlayer(viewController: ViewControllable?) {
+        if let target = viewController?.uiviewController {
+            target.modalPresentationStyle = .fullScreen
+            self.present(target, animated: true)
         }
     }
 }

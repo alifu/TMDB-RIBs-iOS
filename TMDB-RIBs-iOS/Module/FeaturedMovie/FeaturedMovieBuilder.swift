@@ -2,7 +2,7 @@
 //  FeaturedMovieBuilder.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif Phincon on 13/10/25.
+//  Created by Alif on 13/10/25.
 //
 
 import RIBs

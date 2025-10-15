@@ -65,6 +65,7 @@ final class WatchListInteractor: PresentableInteractor<WatchListPresentable>, Wa
     
     private func fetchSearchMovie() {
         isLoading.accept(true)
+        errorState.accept(nil)
         let request = TheMovieWatchList.Request(page: 1, language: "en-US")
         apiManager.fetchMovieWatchList(request: request)
             .subscribe(onSuccess: { [weak self] movies in

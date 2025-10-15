@@ -44,7 +44,8 @@ Root RIB
  ├── Search RIB (browse, search)
  ├── Watch List RIB (saved movies)
  └── Movie Detail RIB (backdrop, poster and movie info)
-     └── Movie Detail Info RIB (overview, reviews, actors & crew)
+        ├── Carousel Movie RIB (backdrop and trailer)
+        └── Movie Detail Info RIB (overview, reviews, actors & crew)
 ```
 
 | Component | Responsibility |
@@ -126,6 +127,7 @@ TMDB-RIBs-iOS/
 │   ├── FeaturedMovie/
 │   ├── MainTabbar/
 │   ├── MovieDetail/
+│   ├── CarouselMovie/
 │   ├── MovieDetailInfo/
 │   ├── MovieList/
 │   ├── Search/
@@ -160,6 +162,7 @@ Using [The Movie Database API](https://developer.themoviedb.org/reference), comm
 | `/search/movie` | Search for movies |
 | `/movie/{id}/account_states` | Movie status that connected to account |
 | `/account/{accountID}/watchlist/movies` | Watch List movies |
+| `/movie/{id}/videos` | Trailer or marketing videos |
 
 Networking is handled through Moya for cleaner endpoint definitions and response mapping.
 
@@ -175,8 +178,8 @@ Networking is handled through Moya for cleaner endpoint definitions and response
 | ✅ | Modular navigation using RIBs |
 | ✅ | Cast and video sections |
 | ✅ | Caching support for images |
+| ✅ | Trailer |
 | 🚧 | Offline cache support for APIs |
-| 🚧 | Trailer |
 | 🚧 | Unit & UI tests |
 | 🚧 | SwiftUI hybrid example |
 

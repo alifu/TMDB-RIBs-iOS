@@ -41,6 +41,7 @@ struct TheMovieDetail {
         let voteAverage: Double
         let voteCount: Int
         var accountStates: TheMovieAccountStates.Response?
+        var videos: TheMovieVideo.Response?
 
         enum CodingKeys: String, CodingKey {
             case adult

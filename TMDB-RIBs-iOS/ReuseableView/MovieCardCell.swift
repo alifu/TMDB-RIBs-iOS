@@ -92,7 +92,7 @@ final class MovieCardCell: UITableViewCell {
         }
     }
     
-    func setupContent(with movie: TheMovieSearchMovie.Result) {
+    func setupContent(with movie: TheMovieSearch.Result) {
         loadImage(path: movie.posterPath)
         titleLabel.text = movie.title
         releaseLabel.text = movie.releaseYear

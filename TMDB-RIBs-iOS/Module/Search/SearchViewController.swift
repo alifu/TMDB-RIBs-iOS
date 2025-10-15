@@ -24,7 +24,7 @@ protocol SearchPresentableListener: AnyObject {
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
     func didSearch(with query: String)
-    func didSelectMovie(_ movie: TheMovieSearchMovie.Result)
+    func didSelectMovie(_ movie: TheMovieSearch.Result)
 }
 
 final class SearchViewController: UIViewController, SearchPresentable, SearchViewControllable {
@@ -67,7 +67,7 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    func bindMovieItems(_ items: Observable<[TheMovieSearchMovie.Result]>) {
+    func bindMovieItems(_ items: Observable<[TheMovieSearch.Result]>) {
         items
             .map { [SectionOfSearchMovie(header: "movie", items: $0)] }
             .bind(to: tableView.rx.items(dataSource: dataSource))
@@ -127,7 +127,7 @@ final class SearchViewController: UIViewController, SearchPresentable, SearchVie
         
         Observable.zip(
             tableView.rx.itemSelected,
-            tableView.rx.modelSelected(TheMovieSearchMovie.Result.self)
+            tableView.rx.modelSelected(TheMovieSearch.Result.self)
         )
         .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
         .subscribe(onNext: { [weak self] indexPath, selected in

@@ -17,13 +17,14 @@ enum TheMovieAPI {
     case nowPlaying(request: TheMovieNowPlaying.Request, isLocal: Bool = false)
     case upComing(request: TheMovieUpComing.Request, isLocal: Bool = false)
     case topRated(request: TheMovieTopRated.Request, isLocal: Bool = false)
-    case searchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool = false)
+    case searchMovie(request: TheMovieSearch.Request, isLocal: Bool = false)
     case movieDetail(id: Int, isLocal: Bool = false)
     case movieAccountStates(id: Int, isLocal: Bool = false)
     case movieReview(id: Int, isLocal: Bool = false)
     case movieCredit(id: Int, isLocal: Bool = false)
     case postWatchList(request: TheMovieWatchListPost.Request, isLocal: Bool = false)
     case movieWatchList(request: TheMovieWatchList.Request, isLocal: Bool = false)
+    case movieVideo(id: Int, isLocal: Bool = false)
 }
 
 extension TheMovieAPI: TargetType {
@@ -41,7 +42,8 @@ extension TheMovieAPI: TargetType {
                 .movieReview(_, let isLocal),
                 .movieCredit(_, let isLocal),
                 .postWatchList(_, let isLocal),
-                .movieWatchList(_, let isLocal):
+                .movieWatchList(_, let isLocal),
+                .movieVideo(_, let isLocal):
             
             if isLocal {
                 return URL(string: Natrium.Config.baseUrlLocal)!
@@ -76,6 +78,8 @@ extension TheMovieAPI: TargetType {
             return "/account/\(Natrium.Config.accountID)/watchlist"
         case .movieWatchList:
             return "/account/\(Natrium.Config.accountID)/watchlist/movies"
+        case .movieVideo(let id, _):
+            return "/movie/\(id)/videos"
         }
     }
     var method: Moya.Method {
@@ -160,6 +164,11 @@ extension TheMovieAPI: TargetType {
                 parameters: ["language": request.language, "page": request.page],
                 encoding: URLEncoding.default
             )
+        case .movieVideo(_, _):
+            return .requestParameters(
+                parameters: ["language": "en-US"],
+                encoding: URLEncoding.default
+            )
         }
     }
     var headers: [String : String]? {
@@ -178,13 +187,13 @@ protocol TheMovieProtocol {
     func fetchNowPlayingMovie(request: TheMovieNowPlaying.Request, isLocal: Bool) -> Single<TheMovieNowPlaying.Response>
     func fetchUpComingMovie(request: TheMovieUpComing.Request, isLocal: Bool) -> Single<TheMovieUpComing.Response>
     func fetchTopRatedMovie(request: TheMovieTopRated.Request, isLocal: Bool) -> Single<TheMovieTopRated.Response>
-    func fetchSearchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<TheMovieSearchMovie.Response>
+    func fetchSearchMovie(request: TheMovieSearch.Request, isLocal: Bool) -> Single<TheMovieSearch.Response>
     func fetchMovieDetail(id: Int, isLocal: Bool) -> Single<TheMovieDetail.Response>
     func fetchMovieAccountStates(id: Int, isLocal: Bool) -> Single<TheMovieAccountStates.Response>
-    func fetchMovieDetailWithStates(id: Int, isLocal: Bool) -> Single<TheMovieDetail.Response>
+    func fetchMovieDetailWithStates(id: Int, isLocal: Bool) -> Observable<TheMovieDetail.Response>
     func fetchMovieReviews(id: Int, isLocal: Bool) -> Single<TheMovieReview.Response>
     func fetchMovieCredits(id: Int, isLocal: Bool) -> Single<TheMovieCredit.Response>
-    func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool) -> Single<[MovieItem]>
+    func fetchSearchMovieWithDetails(request: TheMovieSearch.Request, isLocal: Bool) -> Single<[MovieItem]>
     func postWatchList(request: TheMovieWatchListPost.Request, isLocal: Bool) -> Single<TheMovieWatchListPost.Response>
     func fetchMovieWatchList(request: TheMovieWatchList.Request, isLocal: Bool) -> Single<TheMovieWatchList.Response>
 }
@@ -193,6 +202,7 @@ struct APIManager {
     
     static let shared = APIManager()
     static let provider = MoyaProvider<TheMovieAPI>()
+    private let disposeBag = DisposeBag()
     
     private init() {}
 }
@@ -229,10 +239,10 @@ extension APIManager: TheMovieProtocol {
             .map(TheMovieTopRated.Response.self)
     }
     
-    func fetchSearchMovie(request: TheMovieSearchMovie.Request, isLocal: Bool = false) -> Single<TheMovieSearchMovie.Response> {
+    func fetchSearchMovie(request: TheMovieSearch.Request, isLocal: Bool = false) -> Single<TheMovieSearch.Response> {
         return APIManager.provider.rx
             .request(.searchMovie(request: request, isLocal: isLocal))
-            .map(TheMovieSearchMovie.Response.self)
+            .map(TheMovieSearch.Response.self)
     }
     
     func fetchMovieDetail(id: Int, isLocal: Bool = false) -> Single<TheMovieDetail.Response> {
@@ -247,20 +257,42 @@ extension APIManager: TheMovieProtocol {
             .map(TheMovieAccountStates.Response.self)
     }
     
-    func fetchMovieDetailWithStates(id: Int, isLocal: Bool = false) -> Single<TheMovieDetail.Response> {
-        let detailSingle = APIManager.provider.rx
+    func fetchMovieDetailWithStates(id: Int, isLocal: Bool = false) -> Observable<TheMovieDetail.Response> {
+        let subject = PublishSubject<TheMovieDetail.Response>()
+        
+        APIManager.provider.rx
             .request(.movieDetail(id: id, isLocal: isLocal))
             .map(TheMovieDetail.Response.self)
+            .subscribe(onSuccess: { detail in
+                // Emit detail immediately
+                subject.onNext(detail)
+                
+                // Then continue fetching state and video
+                Single.zip(
+                    APIManager.provider.rx
+                        .request(.movieAccountStates(id: id, isLocal: isLocal))
+                        .map(TheMovieAccountStates.Response.self),
+                    APIManager.provider.rx
+                        .request(.movieVideo(id: id, isLocal: isLocal))
+                        .map(TheMovieVideo.Response.self)
+                )
+                .subscribe(onSuccess: { state, video in
+                    var updatedDetail = detail
+                    updatedDetail.accountStates = state
+                    updatedDetail.videos = video
+                    subject.onNext(updatedDetail)
+                    subject.onCompleted()
+                }, onFailure: { error in
+                    subject.onError(error)
+                })
+                .disposed(by: disposeBag)
+                
+            }, onFailure: { error in
+                subject.onError(error)
+            })
+            .disposed(by: disposeBag)
         
-        let stateSingle = APIManager.provider.rx
-            .request(.movieAccountStates(id: id, isLocal: isLocal))
-            .map(TheMovieAccountStates.Response.self)
-        
-        return Single.zip(detailSingle, stateSingle) { detail, state in
-            var currentDetail = detail
-            currentDetail.accountStates = state
-            return currentDetail
-        }
+        return subject.asObservable()
     }
     
     func fetchMovieReviews(id: Int, isLocal: Bool = false) -> Single<TheMovieReview.Response> {
@@ -275,7 +307,7 @@ extension APIManager: TheMovieProtocol {
             .map(TheMovieCredit.Response.self)
     }
     
-    func fetchSearchMovieWithDetails(request: TheMovieSearchMovie.Request, isLocal: Bool = false) -> Single<[MovieItem]> {
+    func fetchSearchMovieWithDetails(request: TheMovieSearch.Request, isLocal: Bool = false) -> Single<[MovieItem]> {
         return fetchSearchMovie(request: request, isLocal: isLocal)
             .flatMap { response -> Single<[MovieItem]> in
                 let detailSingles = response.results.map { movie in

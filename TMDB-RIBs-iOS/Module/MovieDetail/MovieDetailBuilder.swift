@@ -13,10 +13,11 @@ protocol MovieDetailDependency: Dependency {
     // created by this RIB.
 }
 
-final class MovieDetailComponent: Component<MovieDetailDependency>, MovieDetailInfoDependency {
+final class MovieDetailComponent: Component<MovieDetailDependency>, MovieDetailInfoDependency, CarouselMovieDependency {
 
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
     var aboutMovieRelay: BehaviorRelay<String?> = .init(value: nil)
+    var carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]> = .init(value: [])
 }
 
 // MARK: - Builder
@@ -36,16 +37,21 @@ final class MovieDetailBuilder: Builder<MovieDetailDependency>, MovieDetailBuild
         let viewController = MovieDetailViewController()
         let interactor = MovieDetailInteractor(
             presenter: viewController,
-            dependency: component,
+            dependencyInfo: component,
+            dependencyCarousel: component,
             apiManager: apiManager,
             withMovieId: withMovieId
         )
         let movieDetailInfoBuilder = MovieDetailInfoBuilder(dependency: component)
+        let carouselBuilder = CarouselMovieBuilder(dependency: component)
+        let webPlayerBuilder = WebPlayerBuilder(dependency: component)
         interactor.listener = listener
         return MovieDetailRouter(
             interactor: interactor,
             viewController: viewController,
-            movieDetailInfoBuilder: movieDetailInfoBuilder
+            movieDetailInfoBuilder: movieDetailInfoBuilder,
+            carouselMovieBuilder: carouselBuilder,
+            webPlayerBuilder: webPlayerBuilder
         )
     }
 }

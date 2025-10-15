@@ -19,7 +19,7 @@ protocol SearchRouting: ViewableRouting {
 protocol SearchPresentable: Presentable {
     var listener: SearchPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
-    func bindMovieItems(_ items: Observable<[TheMovieSearchMovie.Result]>)
+    func bindMovieItems(_ items: Observable<[TheMovieSearch.Result]>)
     func loading(_ isLoading: Observable<Bool>)
     func errorViewVisible(_ model: Observable<ErrorViewModel?>)
 }
@@ -33,7 +33,7 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     weak var router: SearchRouting?
     weak var listener: SearchListener?
     private let apiManager: APIManager
-    private var movieItemRelay: BehaviorRelay<[TheMovieSearchMovie.Result]> = .init(value: [])
+    private var movieItemRelay: BehaviorRelay<[TheMovieSearch.Result]> = .init(value: [])
     private var isLoading = PublishRelay<Bool>()
     private let errorState = BehaviorRelay<ErrorViewModel?>(value: nil)
     
@@ -65,7 +65,7 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     private func fetchSearchMovie(with query: String) {
         isLoading.accept(true)
         errorState.accept(nil)
-        let request = TheMovieSearchMovie.Request(page: 1, language: "en-US", includeAdult: true, query: query)
+        let request = TheMovieSearch.Request(page: 1, language: "en-US", includeAdult: true, query: query)
         apiManager.fetchSearchMovie(request: request)
             .subscribe(onSuccess: { [weak self] movies in
                 guard let self else { return }
@@ -111,7 +111,7 @@ extension SearchInteractor {
         self.router?.detachMovieDetail()
     }
     
-    func didSelectMovie(_ movie: TheMovieSearchMovie.Result) {
+    func didSelectMovie(_ movie: TheMovieSearch.Result) {
         self.router?.openMovieDetail(withId: movie.id, apiManager: apiManager)
     }
 }

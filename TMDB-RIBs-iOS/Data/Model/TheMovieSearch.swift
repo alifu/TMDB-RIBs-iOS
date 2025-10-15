@@ -8,7 +8,7 @@
 import Foundation
 import RxDataSources
 
-struct TheMovieSearchMovie {
+struct TheMovieSearch {
     
     struct Request {
         let page: Int
@@ -75,11 +75,11 @@ struct TheMovieSearchMovie {
 
 struct SectionOfSearchMovie {
     var header: String
-    var items: [TheMovieSearchMovie.Result]
+    var items: [TheMovieSearch.Result]
 }
 
 extension SectionOfSearchMovie: SectionModelType {
-    init(original: SectionOfSearchMovie, items: [TheMovieSearchMovie.Result]) {
+    init(original: SectionOfSearchMovie, items: [TheMovieSearch.Result]) {
         self = original
         self.items = items
     }
