@@ -11,6 +11,7 @@ import RxSwift
 protocol MainTabBarRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
     func attachTabs()
+    func routeToSearch(query: String)
 }
 
 protocol MainTabBarPresentable: Presentable {

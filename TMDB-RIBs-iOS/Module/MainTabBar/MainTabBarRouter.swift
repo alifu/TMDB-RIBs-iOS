@@ -24,6 +24,7 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
     
     private let homeBuilder: HomeBuildable
     private let searchBuilder: SearchBuildable
+    private var searchTab: SearchRouting?
     private let watchListBuilder: WatchListBuildable
     
     // TODO: Constructor inject child builder protocols to allow building children.
@@ -59,6 +60,7 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
         
         attachChild(homeTabBuilder)
         attachChild(searchTabBuilder)
+        searchTab = searchTabBuilder
         attachChild(watchListTabBuilder)
         
         if #available(iOS 26.0, *) {
@@ -107,6 +109,12 @@ final class MainTabBarRouter: ViewableRouter<MainTabBarInteractable, MainTabBarV
                 searchNavigation,
                 watchListNavigation
             ])
+        }
+    }
+    
+    func routeToSearch(query: String) {
+        if let searchRouter = searchTab {
+            searchRouter.setInitialQuery(query)
         }
     }
 }

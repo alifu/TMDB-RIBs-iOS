@@ -14,6 +14,7 @@ protocol SearchRouting: ViewableRouting {
     // TODO: Declare methods the interactor can invoke to manage sub-tree via the router.
     func openMovieDetail(withId: Int, apiManager: APIManager)
     func detachMovieDetail()
+    func setInitialQuery(_ query: String)
 }
 
 protocol SearchPresentable: Presentable {
@@ -22,6 +23,7 @@ protocol SearchPresentable: Presentable {
     func bindMovieItems(_ items: Observable<[TheMovieSearch.Result]>)
     func loading(_ isLoading: Observable<Bool>)
     func errorViewVisible(_ model: Observable<ErrorViewModel?>)
+    func activateSearchPageFromDeeplink(_ query: String?)
 }
 
 protocol SearchListener: AnyObject {
@@ -102,6 +104,10 @@ final class SearchInteractor: PresentableInteractor<SearchPresentable>, SearchIn
     
     func didSearch(with query: String) {
         fetchSearchMovie(with: query)
+    }
+    
+    func setInitialQuery(_ query: String) {
+        self.presenter.activateSearchPageFromDeeplink(query)
     }
 }
 

@@ -193,4 +193,13 @@ extension SearchViewController {
             .bind(to: self.view.rx.loaderVisible)
             .disposed(by: disposeBag)
     }
+    
+    func activateSearchPageFromDeeplink(_ query: String?) {
+        if #available(iOS 26.0, *) {
+            self.tabBarController?.selectedIndex = 2
+        } else {
+            self.tabBarController?.selectedIndex = 1
+        }
+        self.searchController.searchBar.text = query
+    }
 }

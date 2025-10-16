@@ -171,6 +171,16 @@ Networking is handled through Moya for cleaner endpoint definitions and response
 
 ---
 
+## 🔗 Deeplink
+
+|Status| Deeplink | Description |
+|:------:|------|----------|
+| ✅ |`appworktmdb://search?query={query}`|Route to search page with query search|
+| 🚧 |`appworktmdb://movie/{movieID}`|Route to detail page based on movie ID|
+| 🚧 |`appworktmdb://home/tab/{type}`|Route to home page based on movie list (type: now_playing, up_coming, top_rated, popular) |
+
+---
+
 ## 🧪 Roadmap
 
 | Status | Feature |
@@ -182,6 +192,7 @@ Networking is handled through Moya for cleaner endpoint definitions and response
 | ✅ | Cast and video sections |
 | ✅ | Caching support for images |
 | ✅ | Trailer |
+| 🚧 | Deeplink |
 | 🚧 | Offline cache support for APIs |
 | 🚧 | Unit & UI tests |
 | 🚧 | SwiftUI hybrid example |

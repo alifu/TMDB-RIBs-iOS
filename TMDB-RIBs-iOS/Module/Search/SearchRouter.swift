@@ -51,3 +51,9 @@ final class SearchRouter: ViewableRouter<SearchInteractable, SearchViewControlla
         }
     }
 }
+
+extension SearchRouter {
+    func setInitialQuery(_ query: String) {
+        (interactor as? SearchInteractor)?.setInitialQuery(query)
+    }
+}

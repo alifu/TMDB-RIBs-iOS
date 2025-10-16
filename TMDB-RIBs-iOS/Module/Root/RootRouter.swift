@@ -21,6 +21,7 @@ protocol RootViewControllable: ViewControllable {
 final class RootRouter: LaunchRouter<RootInteractable, RootViewControllable>, RootRouting {
     
     private let tabBarBuilder: MainTabBarBuilder
+    var tabBar: MainTabBarRouting?
     
     // TODO: Constructor inject child builder protocols to allow building children.
     init(interactor: RootInteractable,
@@ -36,11 +37,12 @@ final class RootRouter: LaunchRouter<RootInteractable, RootViewControllable>, Ro
         attachTabBar()
     }
     
-    private func attachTabBar() {
-        let tabBar = tabBarBuilder.build(withListener: interactor)
-        attachChild(tabBar)
-        viewController.attachTabbarView(viewController: tabBar.viewControllable)
-        tabBar.attachTabs()
+    func attachTabBar() {
+        let child = tabBarBuilder.build(withListener: interactor)
+        attachChild(child)
+        tabBar = child
+        viewController.attachTabbarView(viewController: child.viewControllable)
+        child.attachTabs()
     }
 }
 

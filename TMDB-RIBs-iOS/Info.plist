@@ -6,6 +6,19 @@
 	<string>TMDB-RIBs-iOS</string>
 	<key>CFBundleIdentifier</key>
 	<string>AppWork.TMDB-RIBs-iOS</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>AppWork.TMDB-RIBs-iOS</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>appworktmdb</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

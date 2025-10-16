@@ -120,6 +120,24 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else { return }
+        
+        guard let deeplink = Deeplink(url: url),
+              let rootRouter = self.launchRouter as? DeeplinkHandler else {
+            return
+        }
+        
+        rootRouter.handleDeeplink(deeplink)
+    }
+    
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL,
+           let deeplink = Deeplink(url: url),
+           let rootRouter = self.launchRouter as? DeeplinkHandler {
+            rootRouter.handleDeeplink(deeplink)
+        }
+    }
 }
 
