@@ -39,14 +39,7 @@ final class RootRouter: LaunchRouter<RootInteractable, RootViewControllable>, Ro
     private func attachTabBar() {
         let tabBar = tabBarBuilder.build(withListener: interactor)
         attachChild(tabBar)
-        
-        // Set TabBar as root view
-//        let window = UIApplication.shared.windows.first
-//        window?.rootViewController = tabBar.viewControllable.uiviewController
-//        window?.makeKeyAndVisible()
-        
         viewController.attachTabbarView(viewController: tabBar.viewControllable)
-        
         tabBar.attachTabs()
     }
 }

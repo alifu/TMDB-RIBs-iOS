@@ -7,7 +7,7 @@
 
 import RIBs
 
-protocol HomeInteractable: Interactable, FeaturedMovieListener, MovieListsListener, MovieDetailListener {
+protocol HomeInteractable: Interactable, FeaturedMovieListener, MovieListsListener, MovieDetailListener, MiniTabListener {
     var router: HomeRouting? { get set }
     var listener: HomeListener? { get set }
 }
@@ -15,6 +15,7 @@ protocol HomeInteractable: Interactable, FeaturedMovieListener, MovieListsListen
 protocol HomeViewControllable: ViewControllable {
     // TODO: Declare methods the router invokes to manipulate the view hierarchy.
     func attachFeaturedMovieView(viewController: ViewControllable?)
+    func attachMiniTabView(viewController: ViewControllable?)
     func attachMovieListsView(viewController: ViewControllable?)
     func openMovieDetail(viewController: ViewControllable?)
 }
@@ -27,6 +28,8 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
     private var movieLists: MovieListsRouting?
     private let movieDetailBuilder: MovieDetailBuildable
     private var movieDetail: MovieDetailRouting?
+    private var miniTabBuilder: MiniTabBuilder
+    private var miniTab: MiniTabRouting?
     
     // TODO: Constructor inject child builder protocols to allow building children.
     init(
@@ -34,11 +37,13 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
         viewController: HomeViewControllable,
         featuredMovieBuilder: FeaturedMovieBuilder,
         movieListsBuilder: MovieListsBuildable,
-        movieDetailBuilder: MovieDetailBuildable
+        movieDetailBuilder: MovieDetailBuildable,
+        miniTabBuilder: MiniTabBuilder
     ) {
         self.featuredMovieBuilder = featuredMovieBuilder
         self.movieListsBuilder = movieListsBuilder
         self.movieDetailBuilder = movieDetailBuilder
+        self.miniTabBuilder = miniTabBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
@@ -90,6 +95,25 @@ final class HomeRouter: ViewableRouter<HomeInteractable, HomeViewControllable>, 
         if let detach = movieDetail {
             detachChild(detach)
             movieDetail = nil
+        }
+    }
+    
+    func attachMiniTab(_ data: [MiniTab]) -> MiniTabInteractable? {
+        guard miniTab == nil else { return miniTab?.interactable as? MiniTabInteractable }
+        let childRouter = miniTabBuilder.build(
+            withListener: interactor,
+            miniTab: data
+        )
+        miniTab = childRouter
+        attachChild(childRouter)
+        viewController.attachMiniTabView(viewController: miniTab?.viewControllable)
+        return childRouter.interactable as? MiniTabInteractable
+    }
+    
+    func detachMiniTab() {
+        if let detach = miniTab {
+            detachChild(detach)
+            miniTab = nil
         }
     }
 }

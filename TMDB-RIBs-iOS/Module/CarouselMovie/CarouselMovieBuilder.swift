@@ -12,13 +12,13 @@ import RxSwift
 protocol CarouselMovieDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
     // created by this RIB.
-    var carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]> { get }
+    var carouselMovieItems: BehaviorRelay<[TheMovieCarousel]> { get }
 }
 
 final class CarouselMovieComponent: Component<CarouselMovieDependency>, CarouselMovieDependency {
 
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
-    internal var carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]> {
+    internal var carouselMovieItems: BehaviorRelay<[TheMovieCarousel]> {
         dependency.carouselMovieItems
     }
 }

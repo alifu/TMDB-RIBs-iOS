@@ -18,6 +18,8 @@ protocol MovieDetailRouting: ViewableRouting {
     func detachCarousel()
     func attachWebPlayerChild(withURL url: URL) -> WebPlayerInteractable?
     func detachWebPlayer()
+    func attachMiniTab(_ data: [MiniTab]) -> MiniTabInteractable?
+    func detachMiniTab()
 }
 
 protocol MovieDetailPresentable: Presentable {
@@ -45,7 +47,8 @@ final class MovieDetailInteractor: PresentableInteractor<MovieDetailPresentable>
     private var isLoading = PublishRelay<Bool>()
     private var aboutMovieRelay: BehaviorRelay<String?>
     private var isWatchList: BehaviorRelay<Bool> = .init(value: false)
-    private let carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]>
+    private let carouselMovieItems: BehaviorRelay<[TheMovieCarousel]>
+    private var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)>
     
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -60,6 +63,7 @@ final class MovieDetailInteractor: PresentableInteractor<MovieDetailPresentable>
         self.withMovieId = withMovieId
         self.aboutMovieRelay = dependencyInfo.aboutMovieRelay
         self.carouselMovieItems = dependencyCarousel.carouselMovieItems
+        self.selectedMiniTabRelay = dependencyInfo.selectedMiniTabRelay
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -71,6 +75,7 @@ final class MovieDetailInteractor: PresentableInteractor<MovieDetailPresentable>
         self.presenter.bindContent(with: movieInfoRelay.asObservable())
         self.presenter.bindWatchListButton(with: isWatchList.asObservable())
         attachCarousel()
+        attachMiniTab()
         fetchMovieDetail()
         attacMovieInfo()
     }
@@ -166,6 +171,13 @@ final class MovieDetailInteractor: PresentableInteractor<MovieDetailPresentable>
             child.listener = self
         }
     }
+    
+    private func attachMiniTab() {
+        let tabs = theMovieDetailInfo.map { MiniTab.movieDetail($0) }
+        if let child = self.router?.attachMiniTab(tabs) {
+            child.listener = self
+        }
+    }
 }
 
 extension MovieDetailInteractor {
@@ -186,5 +198,9 @@ extension MovieDetailInteractor {
     
     func goBackFromWebPlayer() {
         self.router?.detachWebPlayer()
+    }
+    
+    func selectedMiniTab(_ indexPath: IndexPath, item: MiniTab) {
+        selectedMiniTabRelay.accept((indexPath, item))
     }
 }

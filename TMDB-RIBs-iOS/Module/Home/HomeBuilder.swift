@@ -7,6 +7,7 @@
 
 import RIBs
 import RxCocoa
+import Foundation
 
 protocol HomeDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
@@ -18,6 +19,7 @@ final class HomeComponent: Component<HomeDependency>, MovieListsDependency {
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
     let loadMoreTrigger = PublishRelay<Void>()
     let isLoadingRelay = BehaviorRelay<Bool>(value: false)
+    var selectedMiniTabRelay = PublishRelay<(IndexPath, MiniTab)>()
 }
 
 // MARK: - Builder
@@ -41,6 +43,7 @@ final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
             dependency: component
         )
         let featuredMovieBuilder = FeaturedMovieBuilder(dependency: component)
+        let miniTabBuilder = MiniTabBuilder(dependency: component)
         let movieListsBuilder = MovieListsBuilder(dependency: component)
         let movieDetailBuilder = MovieDetailBuilder(dependency: component)
         interactor.listener = listener
@@ -49,7 +52,8 @@ final class HomeBuilder: Builder<HomeDependency>, HomeBuildable {
             viewController: viewController,
             featuredMovieBuilder: featuredMovieBuilder,
             movieListsBuilder: movieListsBuilder,
-            movieDetailBuilder: movieDetailBuilder
+            movieDetailBuilder: movieDetailBuilder,
+            miniTabBuilder: miniTabBuilder
         )
     }
 }

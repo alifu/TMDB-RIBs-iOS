@@ -40,11 +40,13 @@ RIBs separates business logic, navigation, and view rendering into distinct unit
 Root RIB
  ├── Home RIB (handle scrolling and pagination/load more)
  │      ├── Featured RIB (Trending movies by today)
+ │      ├── Mini Tab RIB (tab inside page)
  │      └── Movie List RIB (Now Playing, Up Coming, Top Rated, Popular)
  ├── Search RIB (browse, search)
  ├── Watch List RIB (saved movies)
  └── Movie Detail RIB (backdrop, poster and movie info)
         ├── Carousel Movie RIB (backdrop and trailer)
+        ├── Mini Tab RIB (tab inside page)
         └── Movie Detail Info RIB (overview, reviews, actors & crew)
 ```
 
@@ -126,6 +128,7 @@ TMDB-RIBs-iOS/
 │   ├── Root/
 │   ├── FeaturedMovie/
 │   ├── MainTabbar/
+│   ├── MiniTab/
 │   ├── MovieDetail/
 │   ├── CarouselMovie/
 │   ├── MovieDetailInfo/

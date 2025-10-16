@@ -5,6 +5,7 @@
 //  Created by Alif on 06/10/25.
 //
 
+import Foundation
 import RIBs
 import RxCocoa
 
@@ -17,7 +18,8 @@ final class MovieDetailComponent: Component<MovieDetailDependency>, MovieDetailI
 
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
     var aboutMovieRelay: BehaviorRelay<String?> = .init(value: nil)
-    var carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]> = .init(value: [])
+    var carouselMovieItems: BehaviorRelay<[TheMovieCarousel]> = .init(value: [])
+    var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)> = .init()
 }
 
 // MARK: - Builder
@@ -45,13 +47,15 @@ final class MovieDetailBuilder: Builder<MovieDetailDependency>, MovieDetailBuild
         let movieDetailInfoBuilder = MovieDetailInfoBuilder(dependency: component)
         let carouselBuilder = CarouselMovieBuilder(dependency: component)
         let webPlayerBuilder = WebPlayerBuilder(dependency: component)
+        let miniTabBuilder = MiniTabBuilder(dependency: component)
         interactor.listener = listener
         return MovieDetailRouter(
             interactor: interactor,
             viewController: viewController,
             movieDetailInfoBuilder: movieDetailInfoBuilder,
             carouselMovieBuilder: carouselBuilder,
-            webPlayerBuilder: webPlayerBuilder
+            webPlayerBuilder: webPlayerBuilder,
+            miniTabBuilder: miniTabBuilder
         )
     }
 }

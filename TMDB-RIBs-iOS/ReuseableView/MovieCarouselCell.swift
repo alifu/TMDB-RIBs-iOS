@@ -80,7 +80,7 @@ final class MovieCarouselCell: UICollectionViewCell {
         }
     }
     
-    func configure(with item: TheMovieCaraousel) {
+    func configure(with item: TheMovieCarousel) {
         currentTaskBackDrop?.cancel()
         if let url = item.imageURL {
             let request = ImageRequest(url: url)

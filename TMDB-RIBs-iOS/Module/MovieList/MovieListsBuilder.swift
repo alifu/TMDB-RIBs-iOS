@@ -7,12 +7,14 @@
 
 import RIBs
 import RxCocoa
+import Foundation
 
 protocol MovieListsDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
     // created by this RIB.
     var loadMoreTrigger: PublishRelay<Void> { get }
     var isLoadingRelay: BehaviorRelay<Bool> { get }
+    var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)> { get }
 }
 
 final class MovieListsComponent: Component<MovieListsDependency>, MovieListsDependency {
@@ -23,6 +25,9 @@ final class MovieListsComponent: Component<MovieListsDependency>, MovieListsDepe
     }
     internal var isLoadingRelay: RxRelay.BehaviorRelay<Bool> {
         dependency.isLoadingRelay
+    }
+    var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)> {
+        dependency.selectedMiniTabRelay
     }
 }
 

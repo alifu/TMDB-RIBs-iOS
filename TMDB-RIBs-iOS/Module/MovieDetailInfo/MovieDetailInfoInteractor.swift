@@ -17,7 +17,6 @@ protocol MovieDetailInfoRouting: ViewableRouting {
 protocol MovieDetailInfoPresentable: Presentable {
     var listener: MovieDetailInfoPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
-    func bindTab(_ data: Observable<[TheMovieDetailInfo.Tab]>)
     func bindSelectedTab(_ data: Observable<MovieDetailInfoType>)
     func bindAboutMovie(_ data: Observable<String?>)
     func bindMovieReviews(_ data: Observable<[TheMovieReview.Result]>)
@@ -36,14 +35,13 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
     weak var listener: MovieDetailInfoListener?
     private let apiManager: APIManager
     private let withMovieId: Int
-    private var movieInfoTab: BehaviorRelay<[TheMovieDetailInfo.Tab]> = .init(value: theMovieDetailInfo)
-    private var movieInfoTabData = theMovieDetailInfo
     private let aboutMovieRelay: BehaviorRelay<String?>
     private var tabType: BehaviorRelay<MovieDetailInfoType> = .init(value: .aboutMovie)
     private var movieReviews: BehaviorRelay<[TheMovieReview.Result]> = .init(value: [])
     private var movieCredits: BehaviorRelay<[TheMovieCredit.Cast]> = .init(value: [])
     private var isLoading = PublishRelay<Bool>()
     private let errorState = BehaviorRelay<ErrorViewModel?>(value: nil)
+    private let selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)>
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -56,6 +54,7 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
         self.apiManager = apiManager
         self.withMovieId = withMovieId
         self.aboutMovieRelay = dependency.aboutMovieRelay
+        self.selectedMiniTabRelay = dependency.selectedMiniTabRelay
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -64,17 +63,31 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
         super.didBecomeActive()
         // TODO: Implement business logic here.
         self.presenter.loading(isLoading.asObservable())
-        self.presenter.bindTab(movieInfoTab.asObservable())
         self.presenter.bindSelectedTab(tabType.asObservable())
         self.presenter.bindAboutMovie(aboutMovieRelay.asObservable())
         self.presenter.bindMovieReviews(movieReviews.asObservable())
         self.presenter.bindMovieCredits(movieCredits.asObservable())
         self.presenter.errorViewVisible(errorState.asObservable())
+        bindMiniTab()
     }
 
     override func willResignActive() {
         super.willResignActive()
         // TODO: Pause any business logic.
+    }
+    
+    private func bindMiniTab() {
+        selectedMiniTabRelay
+            .distinctUntilChanged { lhs, rhs in
+                lhs.1 == rhs.1  // compare MiniTab only
+            }
+            .subscribe { [weak self] indexPath, miniTab in
+                guard let `self` = self else { return }
+                if case .movieDetail(let tab) = miniTab {
+                    self.didSelectTab(indexPath, item: tab)
+                }
+            }
+            .disposeOnDeactivate(interactor: self)
     }
     
     private func fetchMovieReviews() {
@@ -130,13 +143,8 @@ final class MovieDetailInfoInteractor: PresentableInteractor<MovieDetailInfoPres
             )
         )
     }
-}
-
-extension MovieDetailInfoInteractor {
     
-    func didSelectTab(_ indexPath: IndexPath, item: TheMovieDetailInfo.Tab) {
-        movieInfoTabData.select(id: item.id)
-        movieInfoTab.accept(movieInfoTabData)
+    private func didSelectTab(_ indexPath: IndexPath, item: TheMovieDetailInfo.Tab) {
         tabType.accept(item.type)
         errorState.accept(nil)
         switch item.type {
@@ -150,4 +158,9 @@ extension MovieDetailInfoInteractor {
             break
         }
     }
+}
+
+extension MovieDetailInfoInteractor {
+    
+    
 }

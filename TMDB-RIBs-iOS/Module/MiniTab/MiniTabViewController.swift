@@ -1,8 +1,8 @@
 //
-//  CarouselMovieViewController.swift
+//  MiniTabViewController.swift
 //  TMDB-RIBs-iOS
 //
-//  Created by Alif on 14/10/25.
+//  Created by Alif on 15/10/25.
 //
 
 import RIBs
@@ -12,36 +12,49 @@ import RxSwift
 import SnapKit
 import UIKit
 
-protocol CarouselMoviePresentableListener: AnyObject {
+protocol MiniTabPresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
-    func didSelectVideo(url: URL)
+    func didLoadTab()
+    func didSelectTab(_ indexPath: IndexPath, item: MiniTab)
 }
 
-final class CarouselMovieViewController: UIViewController, CarouselMoviePresentable, CarouselMovieViewControllable {
+final class MiniTabViewController: UIViewController, MiniTabPresentable, MiniTabViewControllable {
 
-    weak var listener: CarouselMoviePresentableListener?
+    weak var listener: MiniTabPresentableListener?
     private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.view.backgroundColor = .clear
         setupUI()
     }
     
-    func bindCarousel(_ movies: Observable<[TheMovieCarousel]>) {
-        movies
-            .map { [SectionOfMovieCarousel(header: "featured", items: $0)] }
-            .bind(to: collectionView.rx.items(dataSource: dataSource))
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.listener?.didLoadTab()
+    }
+    
+    func bindMiniTab(_ data: Observable<[MiniTab]>) {
+        data
+            .map { tabs in
+                [SectionOfMiniTab(context: tabs.detectedContext, items: tabs)]
+            }
+            .bind(to: collectionView.rx.items(dataSource: tabDataSource))
             .disposed(by: disposeBag)
     }
     
-    private let dataSource = RxCollectionViewSectionedAnimatedDataSource<SectionOfMovieCarousel>(
+    // MARK: - Private
+    
+    private let tabDataSource = RxCollectionViewSectionedReloadDataSource<SectionOfMiniTab>(
         configureCell: { _, collectionView, indexPath, item in
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCarouselCell.idView(), for: indexPath) as? MovieCarouselCell {
-                cell.configure(with: item)
+            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MiniTabCell.idView(), for: indexPath) as? MiniTabCell {
+                switch item {
+                case .movieList(let data):
+                    cell.setupContent(data)
+                case .movieDetail(let data):
+                    cell.setupContent(data)
+                }
                 return cell
             }
             return UICollectionViewCell()
@@ -54,9 +67,9 @@ final class CarouselMovieViewController: UIViewController, CarouselMoviePresenta
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MovieCarouselCell.self, forCellWithReuseIdentifier: MovieCarouselCell.idView())
+        collectionView.register(MiniTabCell.self, forCellWithReuseIdentifier: MiniTabCell.idView())
         collectionView.backgroundColor = .clear
-        collectionView.isPagingEnabled = true
+        collectionView.contentInset.left = 16
         collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
@@ -73,22 +86,21 @@ final class CarouselMovieViewController: UIViewController, CarouselMoviePresenta
         
         Observable.zip(
             collectionView.rx.itemSelected,
-            collectionView.rx.modelSelected(TheMovieCarousel.self)
+            collectionView.rx.modelSelected(MiniTab.self)
         )
         .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
-        .subscribe(onNext: { [weak self] indexPath, selected in
+        .subscribe(onNext: { [weak self] indexPath, item in
             guard let `self` = self else { return }
-            if case .video(let video) = selected, let url = video.videoURL {
-                self.listener?.didSelectVideo(url: url)
-            }
+            self.listener?.didSelectTab(indexPath, item: item)
         })
         .disposed(by: disposeBag)
     }
 }
 
-extension CarouselMovieViewController: UICollectionViewDelegateFlowLayout {
+extension MiniTabViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: collectionView.bounds.width, height: collectionView.bounds.height)
+        let width = 92
+        return CGSize(width: width, height: 41)
     }
 }

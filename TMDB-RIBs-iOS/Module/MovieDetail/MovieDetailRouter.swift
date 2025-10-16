@@ -8,7 +8,7 @@
 import RIBs
 import UIKit
 
-protocol MovieDetailInteractable: Interactable, CarouselMovieListener, MovieDetailInfoListener, WebPlayerListener {
+protocol MovieDetailInteractable: Interactable, CarouselMovieListener, MovieDetailInfoListener, WebPlayerListener, MiniTabListener {
     var router: MovieDetailRouting? { get set }
     var listener: MovieDetailListener? { get set }
 }
@@ -18,6 +18,7 @@ protocol MovieDetailViewControllable: ViewControllable {
     func attachCarousel(viewController: ViewControllable?)
     func attachMovieDetailInfo(viewController: ViewControllable?)
     func attachWebPlayer(viewController: ViewControllable?)
+    func attachMiniTabView(viewController: ViewControllable?)
 }
 
 final class MovieDetailRouter: ViewableRouter<MovieDetailInteractable, MovieDetailViewControllable>, MovieDetailRouting {
@@ -28,6 +29,8 @@ final class MovieDetailRouter: ViewableRouter<MovieDetailInteractable, MovieDeta
     private var carouselMovie: CarouselMovieRouting?
     private let webPlayerBuilder: WebPlayerBuildable
     private var webPlayer: WebPlayerRouting?
+    private var miniTabBuilder: MiniTabBuilder
+    private var miniTab: MiniTabRouting?
 
     // TODO: Constructor inject child builder protocols to allow building children.
     init(
@@ -35,11 +38,13 @@ final class MovieDetailRouter: ViewableRouter<MovieDetailInteractable, MovieDeta
         viewController: MovieDetailViewControllable,
         movieDetailInfoBuilder: MovieDetailInfoBuildable,
         carouselMovieBuilder: CarouselMovieBuildable,
-        webPlayerBuilder: WebPlayerBuildable
+        webPlayerBuilder: WebPlayerBuildable,
+        miniTabBuilder: MiniTabBuilder
     ) {
         self.movieDetailInfoBuilder = movieDetailInfoBuilder
         self.carouselMovieBuilder = carouselMovieBuilder
         self.webPlayerBuilder = webPlayerBuilder
+        self.miniTabBuilder = miniTabBuilder
         super.init(interactor: interactor, viewController: viewController)
         interactor.router = self
     }
@@ -96,6 +101,25 @@ final class MovieDetailRouter: ViewableRouter<MovieDetailInteractable, MovieDeta
         if let detach = webPlayer {
             detachChild(detach)
             webPlayer = nil
+        }
+    }
+    
+    func attachMiniTab(_ data: [MiniTab]) -> MiniTabInteractable? {
+        guard miniTab == nil else { return miniTab?.interactable as? MiniTabInteractable }
+        let childRouter = miniTabBuilder.build(
+            withListener: interactor,
+            miniTab: data
+        )
+        miniTab = childRouter
+        attachChild(childRouter)
+        viewController.attachMiniTabView(viewController: miniTab?.viewControllable)
+        return childRouter.interactable as? MiniTabInteractable
+    }
+    
+    func detachMiniTab() {
+        if let detach = miniTab {
+            detachChild(detach)
+            miniTab = nil
         }
     }
 }

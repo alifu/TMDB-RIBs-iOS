@@ -16,7 +16,6 @@ protocol MovieDetailInfoPresentableListener: AnyObject {
     // TODO: Declare properties and methods that the view controller can invoke to perform
     // business logic, such as signIn(). This protocol is implemented by the corresponding
     // interactor class.
-    func didSelectTab(_ indexPath: IndexPath, item: TheMovieDetailInfo.Tab)
 }
 
 final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPresentable, MovieDetailInfoViewControllable {
@@ -28,13 +27,6 @@ final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPres
         super.viewDidLoad()
         self.view.backgroundColor = .clear
         setupUI()
-    }
-    
-    func bindTab(_ data: Observable<[TheMovieDetailInfo.Tab]>) {
-        data
-            .map{ [SectionOfMovieDetailInfo(header: "tab", items: $0)] }
-            .bind(to: tabCollectionView.rx.items(dataSource: tabDataSource))
-            .disposed(by: disposeBag)
     }
     
     func bindSelectedTab(_ data: Observable<MovieDetailInfoType>) {
@@ -76,16 +68,6 @@ final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPres
             .disposed(by: disposeBag)
     }
     
-    private let tabDataSource = RxCollectionViewSectionedReloadDataSource<SectionOfMovieDetailInfo>(
-        configureCell: { _, collectionView, indexPath, item in
-            if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MiniTabCell.idView(), for: indexPath) as? MiniTabCell {
-                cell.setupContent(item)
-                return cell
-            }
-            return UICollectionViewCell()
-        }
-    )
-    
     private let creditDataSource = RxCollectionViewSectionedReloadDataSource<SectionOfMovieCredit>(
         configureCell: { _, collectionView, indexPath, item in
             if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MovieCreditCell.idView(), for: indexPath) as? MovieCreditCell {
@@ -106,20 +88,7 @@ final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPres
             return UITableViewCell()
         }
     )
-    
-    private let tabCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.minimumInteritemSpacing = 0
-        layout.minimumLineSpacing = 0
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(MiniTabCell.self, forCellWithReuseIdentifier: MiniTabCell.idView())
-        collectionView.backgroundColor = .clear
-        collectionView.contentInset.left = 16
-        collectionView.showsHorizontalScrollIndicator = false
-        return collectionView
-    }()
-    
+
     private let reviewTableView: UITableView = {
         let tableView = UITableView()
         tableView.register(MovieReviewCell.self, forCellReuseIdentifier: MovieReviewCell.idView())
@@ -151,57 +120,34 @@ final class MovieDetailInfoViewController: UIViewController, MovieDetailInfoPres
     }()
     
     private func setupUI() {
-        self.view.addSubview(tabCollectionView)
         self.view.addSubview(overviewLabel)
         self.view.addSubview(reviewTableView)
         self.view.addSubview(creditCollectionView)
         
-        tabCollectionView.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview()
-            $0.height.equalTo(41)
-        }
-        
         overviewLabel.snp.makeConstraints {
-            $0.top.equalTo(tabCollectionView.snp.bottom).offset(16)
+            $0.top.equalToSuperview().inset(16)
             $0.leading.trailing.equalToSuperview()
         }
         
         creditCollectionView.snp.makeConstraints {
-            $0.top.equalTo(tabCollectionView.snp.bottom).offset(16)
+            $0.top.equalToSuperview().inset(16)
             $0.bottom.leading.trailing.equalToSuperview()
         }
         
         reviewTableView.snp.makeConstraints {
-            $0.top.equalTo(tabCollectionView.snp.bottom).offset(16)
+            $0.top.equalToSuperview().inset(16)
             $0.bottom.leading.trailing.equalToSuperview()
         }
         
-        tabCollectionView.rx.setDelegate(self)
-            .disposed(by: disposeBag)
-        
         creditCollectionView.rx.setDelegate(self)
             .disposed(by: disposeBag)
-        
-        Observable.zip(
-            tabCollectionView.rx.itemSelected,
-            tabCollectionView.rx.modelSelected(TheMovieDetailInfo.Tab.self)
-        )
-        .debounce(.milliseconds(200), scheduler: MainScheduler.instance)
-        .subscribe(onNext: { [weak self] indexPath, item in
-            guard let `self` = self else { return }
-            self.listener?.didSelectTab(indexPath, item: item)
-        })
-        .disposed(by: disposeBag)
     }
 }
 
 extension MovieDetailInfoViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == tabCollectionView {
-            let width = 92
-            return CGSize(width: width, height: 41)
-        } else if collectionView == creditCollectionView {
+        if collectionView == creditCollectionView {
             let width = (collectionView.bounds.width - 60) / 2
             return CGSize(width: width, height: width + 24)
         }

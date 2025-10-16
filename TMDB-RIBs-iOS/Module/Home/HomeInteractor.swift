@@ -18,6 +18,8 @@ protocol HomeRouting: ViewableRouting {
     func detachMovieLists()
     func openMovieDetail(withId: Int, apiManager: APIManager)
     func detachMovieDetail()
+    func attachMiniTab(_ data: [MiniTab]) -> MiniTabInteractable?
+    func detachMiniTab()
 }
 
 protocol HomePresentable: Presentable {
@@ -40,6 +42,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     private var heightOfMovieList = PublishRelay<CGFloat>()
     private let loadMoreTrigger: PublishRelay<Void>
     private let isLoadingRelay: BehaviorRelay<Bool>
+    private let selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)>
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.
@@ -51,6 +54,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         self.apiManager = apiManager
         self.loadMoreTrigger = dependency.loadMoreTrigger
         self.isLoadingRelay = dependency.isLoadingRelay
+        self.selectedMiniTabRelay = dependency.selectedMiniTabRelay
         super.init(presenter: presenter)
         presenter.listener = self
     }
@@ -61,6 +65,7 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
         bindLoadMore()
         self.presenter.updateHeightMovieList(with: heightOfMovieList.asObservable())
         attachFeaturedMovie()
+        attachMiniTab()
         attachMovieLists()
     }
 
@@ -77,6 +82,13 @@ final class HomeInteractor: PresentableInteractor<HomePresentable>, HomeInteract
     
     private func attachMovieLists() {
         if let child = router?.attachMovieListsChild(apiManager: apiManager) {
+            child.listener = self
+        }
+    }
+    
+    private func attachMiniTab() {
+        let tabs = theMovieLists.map { MiniTab.movieList($0) }
+        if let child = self.router?.attachMiniTab(tabs) {
             child.listener = self
         }
     }
@@ -107,5 +119,9 @@ extension HomeInteractor {
     
     func goBackFromMovieDetail() {
         self.router?.detachMovieDetail()
+    }
+    
+    func selectedMiniTab(_ indexPath: IndexPath, item: MiniTab) {
+        selectedMiniTabRelay.accept((indexPath, item))
     }
 }

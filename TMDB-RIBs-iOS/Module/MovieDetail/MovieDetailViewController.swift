@@ -72,6 +72,12 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
         return view
     }()
     
+    private let miniTabContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+    
     private let overviewContainer: UIView = {
         let view = UIView()
         view.backgroundColor = .clear
@@ -148,6 +154,7 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
             posterImageView,
             titleLabel,
             overviewContainer,
+            miniTabContainer,
             movieInfoContainer
         ].forEach { item in
             self.view.addSubview(item)
@@ -257,8 +264,14 @@ final class MovieDetailViewController: UIViewController, MovieDetailPresentable,
             $0.trailing.equalTo(overviewContainer.snp.trailing)
         }
         
-        movieInfoContainer.snp.makeConstraints {
+        miniTabContainer.snp.makeConstraints {
             $0.top.equalTo(overviewContainer.snp.bottom).offset(16)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(41)
+        }
+        
+        movieInfoContainer.snp.makeConstraints {
+            $0.top.equalTo(miniTabContainer.snp.bottom).offset(8)
             $0.leading.trailing.equalToSuperview().inset(20)
             $0.bottom.equalToSuperview()
         }
@@ -369,6 +382,18 @@ extension MovieDetailViewController {
         if let target = viewController?.uiviewController {
             target.modalPresentationStyle = .fullScreen
             self.present(target, animated: true)
+        }
+    }
+    
+    func attachMiniTabView(viewController: ViewControllable?) {
+        if let viewController {
+            self.addChild(viewController.uiviewController)
+            miniTabContainer.addSubview(viewController.uiviewController.view)
+            viewController.uiviewController.view.translatesAutoresizingMaskIntoConstraints = false
+            viewController.uiviewController.view.snp.makeConstraints { make in
+                make.edges.equalToSuperview()
+            }
+            viewController.uiviewController.didMove(toParent: self)
         }
     }
 }

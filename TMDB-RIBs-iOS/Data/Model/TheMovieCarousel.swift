@@ -1,5 +1,5 @@
 //
-//  TheMovieCaraousel.swift
+//  TheMovieCarousel.swift
 //  TMDB-RIBs-iOS
 //
 //  Created by Alif on 14/10/25.
@@ -8,7 +8,7 @@
 import Foundation
 import RxDataSources
 
-enum TheMovieCaraousel: IdentifiableType, Equatable {
+enum TheMovieCarousel: IdentifiableType, Equatable {
     case backdrop(URL?)
     case video(TheMovieVideo.Result)
     
@@ -45,7 +45,7 @@ enum TheMovieCaraousel: IdentifiableType, Equatable {
     
     // MARK: - Equatable
     
-    static func == (lhs: TheMovieCaraousel, rhs: TheMovieCaraousel) -> Bool {
+    static func == (lhs: TheMovieCarousel, rhs: TheMovieCarousel) -> Bool {
         switch (lhs, rhs) {
         case (.backdrop(let lURL), .backdrop(let rURL)):
             return lURL == rURL
@@ -59,16 +59,16 @@ enum TheMovieCaraousel: IdentifiableType, Equatable {
 
 struct SectionOfMovieCarousel: AnimatableSectionModelType {
     var header: String
-    var items: [TheMovieCaraousel]
+    var items: [TheMovieCarousel]
     
     var identity: String { header }
     
-    init(header: String, items: [TheMovieCaraousel]) {
+    init(header: String, items: [TheMovieCarousel]) {
         self.header = header
         self.items = items
     }
     
-    init(original: SectionOfMovieCarousel, items: [TheMovieCaraousel]) {
+    init(original: SectionOfMovieCarousel, items: [TheMovieCarousel]) {
         self = original
         self.items = items
     }

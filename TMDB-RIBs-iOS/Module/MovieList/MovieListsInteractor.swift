@@ -17,7 +17,6 @@ protocol MovieListsRouting: ViewableRouting {
 protocol MovieListsPresentable: Presentable {
     var listener: MovieListsPresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
-    func bindMovieLists(_ data: Observable<[TheMovieLists.Tab]>)
     func bindMovies(_ data: Observable<[TheMovieLists.Wrapper]>)
     func loading(_ isLoading: Observable<Bool>)
 }
@@ -33,12 +32,10 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     weak var router: MovieListsRouting?
     weak var listener: MovieListsListener?
     private let apiManager: APIManager
-    private var movieLists: BehaviorRelay<[TheMovieLists.Tab]> = .init(value: theMovieLists)
-    private var movieListData = theMovieLists
     private var movies: BehaviorRelay<[TheMovieLists.Wrapper]> = .init(value: [])
     private let loadMoreTrigger: PublishRelay<Void>
     private let isLoadingRelay: BehaviorRelay<Bool>
-    
+    private let selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)>
     private var activeTabRelay: BehaviorRelay<MovieListsType> = .init(value: .nowPlaying)
     private var currentPageRelay: BehaviorRelay<[MovieListsType: Int]> = .init(value: [
         .nowPlaying: 1,
@@ -66,6 +63,7 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     ) {
         self.isLoadingRelay = dependecy.isLoadingRelay
         self.loadMoreTrigger = dependecy.loadMoreTrigger
+        self.selectedMiniTabRelay = dependecy.selectedMiniTabRelay
         self.apiManager = apiManager
         super.init(presenter: presenter)
         presenter.listener = self
@@ -75,8 +73,8 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
         super.didBecomeActive()
         // TODO: Implement business logic here.
         bindInitialLoading()
-        self.presenter.bindMovieLists(movieLists.asObservable())
         self.presenter.bindMovies(movies.asObservable())
+        bindMiniTab()
         bindLoadMore()
         fetchNowPlayingMovies()
     }
@@ -87,8 +85,6 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     }
     
     func didSelectMovieList(_ indexPath: IndexPath, item: TheMovieLists.Tab) {
-        movieListData.select(id: item.id)
-        movieLists.accept(movieListData)
         activeTabRelay.accept(item.type)
         switch item.type {
         case .nowPlaying:
@@ -173,6 +169,20 @@ final class MovieListsInteractor: PresentableInteractor<MovieListsPresentable>, 
     
     private func currentPage(for type: MovieListsType) -> Int {
         return currentPageRelay.value[type] ?? 1
+    }
+    
+    private func bindMiniTab() {
+        selectedMiniTabRelay
+            .distinctUntilChanged { lhs, rhs in
+                lhs.1 == rhs.1  // compare MiniTab only
+            }
+            .subscribe { [weak self] indexPath, miniTab in
+                guard let `self` = self else { return }
+                if case .movieList(let tab) = miniTab {
+                    self.didSelectMovieList(indexPath, item: tab)
+                }
+            }
+            .disposeOnDeactivate(interactor: self)
     }
     
     private func bindLoadMore() {

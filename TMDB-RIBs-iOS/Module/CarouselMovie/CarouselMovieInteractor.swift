@@ -17,7 +17,7 @@ protocol CarouselMovieRouting: ViewableRouting {
 protocol CarouselMoviePresentable: Presentable {
     var listener: CarouselMoviePresentableListener? { get set }
     // TODO: Declare methods the interactor can invoke the presenter to present data.
-    func bindCarousel(_ movies: Observable<[TheMovieCaraousel]>)
+    func bindCarousel(_ movies: Observable<[TheMovieCarousel]>)
 }
 
 protocol CarouselMovieListener: AnyObject {
@@ -29,7 +29,7 @@ final class CarouselMovieInteractor: PresentableInteractor<CarouselMoviePresenta
 
     weak var router: CarouselMovieRouting?
     weak var listener: CarouselMovieListener?
-    private let carouselMovieItems: BehaviorRelay<[TheMovieCaraousel]>
+    private let carouselMovieItems: BehaviorRelay<[TheMovieCarousel]>
 
     // TODO: Add additional dependencies to constructor. Do not perform any logic
     // in constructor.

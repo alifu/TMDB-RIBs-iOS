@@ -5,6 +5,7 @@
 //  Created by Alif on 08/10/25.
 //
 
+import Foundation
 import RIBs
 import RxCocoa
 
@@ -12,6 +13,7 @@ protocol MovieDetailInfoDependency: Dependency {
     // TODO: Declare the set of dependencies required by this RIB, but cannot be
     // created by this RIB.
     var aboutMovieRelay: BehaviorRelay<String?> { get }
+    var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)> { get }
 }
 
 final class MovieDetailInfoComponent: Component<MovieDetailInfoDependency>, MovieDetailInfoDependency {
@@ -19,6 +21,9 @@ final class MovieDetailInfoComponent: Component<MovieDetailInfoDependency>, Movi
     // TODO: Declare 'fileprivate' dependencies that are only used by this RIB.
     internal var aboutMovieRelay: BehaviorRelay<String?> {
         dependency.aboutMovieRelay
+    }
+    internal var selectedMiniTabRelay: PublishRelay<(IndexPath, MiniTab)> {
+        dependency.selectedMiniTabRelay
     }
 }
 
