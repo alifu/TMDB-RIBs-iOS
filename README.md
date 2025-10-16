@@ -4,11 +4,9 @@
 [![Platform](https://img.shields.io/badge/platform-iOS-lightgrey.svg)](https://developer.apple.com/ios/)
 [![Architecture](https://img.shields.io/badge/Architecture-RIBs-blue.svg)](https://github.com/uber/RIBs)
 
-A modular iOS application powered by **RIBs** architecture, consuming [The Movie Database (TMDB)](https://www.themoviedb.org/documentation/api) API to showcase movie data — such as now playing, popular, top-rated, and more. This project demonstrates scalable, reactive, and maintainable iOS app architecture.
+A modular iOS application powered by **RIBs** architecture, consuming [The Movie Database (TMDB)](https://www.themoviedb.org/documentation/api) API to showcase movie data — such as now playing, popular, top-rated, and more. This project demonstrates scalable, reactive, and maintainable iOS app architecture. 
 
-| Below iOS 26 | iOS 26 |
-|------------|----------------|
-|<img src="./doc/below ios 26.gif" alt="Demo" width="300"/>|<img src="./doc/ios 26.gif" alt="Demo" width="300"/>|
+[Preview](./doc/preview.md)
 
 ---
 
